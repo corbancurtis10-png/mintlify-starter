@@ -1,0 +1,52 @@
+---
+title: "AnimationService.init() — Create a New Instance"
+sidebarTitle: "Init"
+description: "Initialize a new AnimationService instance with a named animation list, mapping string keys to Roblox asset IDs for use across all subsequent calls."
+---
+
+`AnimationService.init()` is the entry point for EZAnim. You call it once to create a self-contained animation service, passing in a list of named animations that every other method on the returned instance will reference by key. You can create multiple independent instances — for example, one for player characters and another for NPCs — and they will not interfere with each other.
+
+## Signature
+
+```lua
+AnimationService.init(options) -> AnimationService
+```
+
+## Parameters
+
+<ParamField path="options" type="table" required>
+  Configuration table used to initialize the service.
+
+  <ParamField path="options.List" type="table">
+    A map of string keys to Roblox animation asset IDs (`rbxassetid://...`). Each key becomes the `id` string you pass to methods like `:play()`, `:stop()`, and `:crossFade()`. Defaults to an empty table if omitted.
+  </ParamField>
+</ParamField>
+
+## Returns
+
+<ResponseField name="AnimationService" type="AnimationService">
+  A new AnimationService instance bound to the provided animation list. Store this in a variable and use it for all subsequent animation calls.
+</ResponseField>
+
+## Example
+
+```lua
+local EZAnim = require(game.ReplicatedStorage.EZAnim)
+
+local Anim = EZAnim.init({
+    List = {
+        Idle   = "rbxassetid://1234567890",
+        Run    = "rbxassetid://0987654321",
+        Jump   = "rbxassetid://1122334455",
+        Attack = "rbxassetid://5566778899",
+    }
+})
+```
+
+<Note>
+  The string keys you define in `List` (e.g. `"Idle"`, `"Run"`) are the `id` values you will pass to every other method. Typos in those keys will silently fail at call time, so keep them consistent.
+</Note>
+
+<Tip>
+  Creating multiple instances is a clean way to separate concerns. For example, you can maintain one instance for player animations and a separate one for enemy NPCs, each with their own `List`.
+</Tip>

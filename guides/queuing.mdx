@@ -1,0 +1,71 @@
+---
+title: "Queuing Animations for Sequential Playback"
+sidebarTitle: "Queuing"
+description: "Use EZAnim's queue system to chain non-looping animations in FIFO order — perfect for combo attacks and cutscene sequences."
+---
+
+EZAnim's queue system lets you line up multiple non-looping animations so each one starts automatically the moment the previous one finishes. You don't need to wire up manual `Stopped` callbacks or manage timing yourself — just queue the IDs in order and EZAnim handles the handoff.
+
+## How the Queue Works
+
+When you call `:queue()`, EZAnim adds the animation ID to a first-in, first-out list tied to that model. As soon as the currently playing animation's `Stopped` event fires, EZAnim pulls the next ID from the queue and plays it automatically.
+
+```lua
+AnimationService:queue(model, id)
+```
+
+The first animation in a sequence still needs to be started explicitly with `:play()`. Subsequent animations in the chain are registered with `:queue()`.
+
+## Playing a Queued Sequence
+
+```lua
+-- Attack1 starts immediately
+Anim:play(char, "Attack1", "Action", false, 0.1)
+
+-- Attack2 and Attack3 wait in line
+Anim:queue(char, "Attack2")
+Anim:queue(char, "Attack3")
+```
+
+When you run this code:
+
+1. **Attack1** plays immediately.
+2. When Attack1 stops, **Attack2** auto-plays.
+3. When Attack2 stops, **Attack3** auto-plays.
+
+<Note>
+  Queued animations play with default settings. You cannot override the `animType`, `looped`, or `fadeTime` for a queued entry — those values are resolved from the animation's defaults at play time.
+</Note>
+
+## Use Cases
+
+<Tabs>
+  <Tab title="Combo Chain">
+    Chain together a sequence of attack animations so each strike flows directly into the next without any extra code.
+
+    ```lua
+    Anim:play(char, "Punch1",  "Action", false, 0.05)
+    Anim:queue(char, "Punch2")
+    Anim:queue(char, "Punch3")
+    Anim:queue(char, "Finisher")
+    ```
+  </Tab>
+  <Tab title="Cutscene Sequence">
+    Play a series of emote or story animations back-to-back for a cutscene without polling or waiting.
+
+    ```lua
+    Anim:play(char, "WalkIn",   "Action", false, 0.2)
+    Anim:queue(char, "LookAround")
+    Anim:queue(char, "SitDown")
+    Anim:queue(char, "Idle")
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  Looping animations will **not** automatically trigger the next item in the queue. The queue fires on the `Stopped` event, and a looping animation never stops on its own — it will block the queue indefinitely. Only use `:queue()` with non-looping animations.
+</Warning>
+
+<Tip>
+  The queue is a great fit for combo systems. Queue all the hits upfront at the start of the first swing, and the full combo plays out naturally even if there's slight network latency.
+</Tip>

@@ -1,0 +1,40 @@
+---
+title: "Check if an Animation is Playing in EZAnim — isPlaying()"
+sidebarTitle: "isPlaying"
+description: "Return true if the specified animation is currently active on a model, false if it has stopped, was never loaded, or the model has no matching track."
+---
+
+The `isPlaying` method checks whether a specific animation is currently active on a model by inspecting the underlying `AnimationTrack.IsPlaying` property. This is the most direct way to guard transitions — for example, only initiating a crossfade when you know the source animation is still running. The method is safe to call at any time; it returns `false` if the animation has never been loaded rather than throwing an error.
+
+<ParamField path="model" type="Model" required>
+  The character or model to check.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key to query.
+</ParamField>
+
+## Returns
+
+<ResponseField name="isPlaying" type="boolean">
+  `true` if the animation track is currently playing on the model, `false` if it has stopped, was never loaded, or the track does not exist.
+</ResponseField>
+
+## Example
+
+```lua
+if Anim:isPlaying(char, "Run") then
+    Anim:crossFade(char, "Run", "Idle", 0.2)
+end
+```
+
+```lua
+-- Prevent replaying an animation that's already active
+if not Anim:isPlaying(char, "Attack") then
+    Anim:play(char, "Attack", "Action", false)
+end
+```
+
+<Note>
+  A **paused** animation still returns `true` because the underlying `AnimationTrack.IsPlaying` is `true` when a track's speed is set to `0`. If you need to distinguish between paused and fully stopped, retrieve the track with `:getAnim()` and inspect `track.Speed` directly.
+</Note>

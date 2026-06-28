@@ -1,0 +1,46 @@
+---
+title: "Using the State System to Track Animation Context"
+sidebarTitle: "State System"
+description: "See how EZAnim's per-model state slot lets you track animation context, guard against duplicate triggers, and cleanly reset a character."
+---
+
+EZAnim provides a lightweight state slot for each model so you can tag a character with an arbitrary value — a string label, a number, or any Luau value — that reflects what it is currently doing. This lets your animation logic read context before deciding whether to play, skip, or transition, without maintaining a separate table of your own.
+
+## Setting and Reading State
+
+Use `:setState()` to assign a value and `:getState()` to retrieve it. EZAnim stores the value internally and associates it with the specific model you pass.
+
+```lua
+-- Set state
+Anim:setState(character, "Running")
+
+-- Check state and act accordingly
+local currentState = Anim:getState(character)
+if currentState == "Running" then
+    Anim:play(character, "Run", "Movement", true)
+end
+
+-- Reset: stops all animations, clears state and queue
+Anim:reset(character)
+```
+
+Calling `:reset()` is a full teardown for that model — it stops every active animation, empties the playback queue, and wipes the state value back to `nil`. Use it when a character respawns, a cutscene ends, or any situation that demands a clean slate.
+
+## EZAnim Does Not Drive Transitions Automatically
+
+<Warning>
+  EZAnim does **not** watch your state value and automatically start or stop animations when it changes. Setting state is purely informational — you are responsible for reading it and calling `:play()` or `:reset()` in response. This keeps your game logic in control of every transition.
+</Warning>
+
+## Guarding Against Re-Triggers
+
+A common and effective pattern is to check the current state before playing an animation, preventing the same clip from restarting while it is already running:
+
+```lua
+if Anim:getState(character) ~= "Attacking" then
+    Anim:setState(character, "Attacking")
+    Anim:play(character, "Attack", "Action", false, 0.1)
+end
+```
+
+This guard means that rapid or repeated input — a player spamming a button, for example — does not restart the attack animation mid-swing. Once the action completes (or you call `:reset()`), the state clears and the next input can trigger the animation again.

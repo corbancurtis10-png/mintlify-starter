@@ -1,0 +1,57 @@
+---
+title: "Animation Priorities: Controlling Playback Order"
+sidebarTitle: "Priorities"
+description: "Understand EZAnim's six priority levels, how higher-priority animations override lower ones, and when to apply each level in your game."
+---
+
+Roblox's animation system uses priorities to decide which animation wins when multiple animations are playing at the same time on the same rig. A higher-priority animation overrides a lower-priority one, so a combat attack can cut through a locomotion cycle without you manually stopping the lower layer first. EZAnim exposes all six Roblox priority levels through the `animType` parameter on `:play()`.
+
+## Priority Levels (Lowest to Highest)
+
+The table below lists every supported priority in ascending order. When two animations conflict on the same track, the one with the higher priority takes visual precedence.
+
+| Level | `animType` string | Roblox Enum |
+|---|---|---|
+| 1 (lowest) | `"Idle"` | `Enum.AnimationPriority.Idle` |
+| 2 | `"Movement"` | `Enum.AnimationPriority.Movement` |
+| 3 | `"Action"` | `Enum.AnimationPriority.Action` |
+| 4 | `"Action2"` | `Enum.AnimationPriority.Action2` |
+| 5 | `"Action3"` | `Enum.AnimationPriority.Action3` |
+| 6 (highest) | `"Action4"` | `Enum.AnimationPriority.Action4` |
+
+## Passing `animType` to `:play()`
+
+Supply the priority name as the third argument to `:play()`. The examples below show all four general tiers in a typical character setup:
+
+```lua
+Anim:play(character, "Idle",    "Idle",     true,  0.15)  -- lowest priority
+Anim:play(character, "Run",     "Movement", true,  0.15)
+Anim:play(character, "Attack",  "Action",   false, 0.1)
+Anim:play(character, "Special", "Action4",  false, 0.1)   -- highest priority
+```
+
+<Note>
+  Priority matching is **case-insensitive** — `"action"`, `"Action"`, and `"ACTION"` all resolve to `Enum.AnimationPriority.Action`. If you pass an unrecognized string or omit `animType` entirely, EZAnim defaults to `Movement`.
+</Note>
+
+## Practical Guidance
+
+Choosing the right priority level keeps your animation layers clean and predictable:
+
+<AccordionGroup>
+  <Accordion title="Idle — ambient and breathing animations">
+    Use `"Idle"` for passive, looping animations that should yield to everything else: breathing cycles, subtle body sway, or an at-rest pose. Any movement or action will override them automatically.
+  </Accordion>
+
+  <Accordion title="Movement — locomotion">
+    Use `"Movement"` for walk, run, strafe, and swim cycles. This level sits above idle so locomotion clips override ambient poses, but it yields to any action the character performs.
+  </Accordion>
+
+  <Accordion title="Action — combat and interactions">
+    Use `"Action"` (and `Action2` / `Action3` where you need sub-layers) for attacks, rolls, emotes, and contextual interactions. These override all locomotion so the character visually commits to the action.
+  </Accordion>
+
+  <Accordion title="Action4 — critical overrides">
+    Reserve `"Action4"` for animations that must never be interrupted by anything else — cinematic finishing moves, stagger reactions, or forced-state transitions that need guaranteed visual authority.
+  </Accordion>
+</AccordionGroup>

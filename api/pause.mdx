@@ -1,0 +1,47 @@
+---
+title: "AnimationService:pause() — Pause an Animation"
+sidebarTitle: "Pause"
+description: "Freeze a playing animation on its current frame by setting its speed to zero, preserving the prior speed so resume() can restore it exactly."
+---
+
+`AnimationService:pause()` freezes a playing animation in place by setting its playback speed to `0`. The animation remains technically active — it is not stopped or unloaded — but it no longer advances through its frames. EZAnim stores the track's speed at the time of the pause so that `:resume()` can restore it to exactly the right value later.
+
+## Signature
+
+```lua
+AnimationService:pause(model, id)
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The model containing the animation you want to pause. The model must have an animation with the given `id` currently playing.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key from your `List` table to pause. If the animation is not currently playing, the call is a no-op.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+Anim:play(char, "Run", "Movement", true)
+task.wait(1)
+
+Anim:pause(char, "Run")   -- freeze on the current frame
+task.wait(2)
+
+Anim:resume(char, "Run")  -- continue from exactly where it stopped
+```
+
+<Note>
+  Pausing does not stop the track. While an animation is paused, it is still considered active — any call that checks whether the animation is playing will still return `true`. If you want to fully end playback, use `:stop()` instead.
+</Note>
+
+<Tip>
+  Pause and resume are useful for cutscenes or dialogue sequences where you want to hold a character in a specific pose mid-animation without losing your place in the animation timeline.
+</Tip>

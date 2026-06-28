@@ -1,0 +1,39 @@
+---
+title: "Read a Model's Animation State in EZAnim — getState()"
+sidebarTitle: "getState"
+description: "Retrieve the state value previously stored on a model with setState(), returning nil if no state has been set, for driving your own animation logic."
+---
+
+The `getState` method returns whatever value was last stored on a model via `:setState()`. If no state has ever been set, or if it was explicitly cleared by passing `nil` to `setState`, this method returns `nil`. Use it anywhere in your code that needs to make decisions based on a character's current animation state — input handlers, physics callbacks, network replication checks, and so on.
+
+<ParamField path="model" type="Model" required>
+  The character or model whose stored state you want to retrieve.
+</ParamField>
+
+## Returns
+
+<ResponseField name="state" type="any">
+  The value previously stored with `:setState()`, or `nil` if no state has been set or the state was explicitly cleared.
+</ResponseField>
+
+## Example
+
+```lua
+local state = Anim:getState(char)
+if state == "Running" then
+    -- transition to a run-stop animation
+    Anim:play(char, "RunStop", "Movement", false, 0.1)
+end
+```
+
+```lua
+-- Works with table states too
+local state = Anim:getState(char)
+if type(state) == "table" and state.mode == "Combat" then
+    Anim:play(char, "CombatIdle", "Idle", true, 0.2)
+end
+```
+
+<Tip>
+  Always guard with a nil check before accessing fields on a state that might be a table. If the character was just spawned or reset, `getState` will return `nil`.
+</Tip>

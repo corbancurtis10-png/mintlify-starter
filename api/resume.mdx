@@ -1,0 +1,41 @@
+---
+title: "AnimationService:resume() — Resume a Paused Animation"
+sidebarTitle: "Resume"
+description: "Restore a paused animation to its original playback speed, continuing from the exact frame where it was frozen by a prior pause() call."
+---
+
+`AnimationService:resume()` re-activates an animation that was frozen by `:pause()`, restoring it to the playback speed that was stored at pause time. The animation continues advancing through its frames from exactly where it left off — no blending or restarting occurs. If EZAnim has no stored speed on record for the given animation (for example, if `:pause()` was never called), it defaults to a speed of `1`.
+
+## Signature
+
+```lua
+AnimationService:resume(model, id)
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The model containing the animation you want to resume. The animation should currently be paused (speed set to `0` via `:pause()`).
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key from your `List` table to resume. If no paused animation with this key is found, the call is a no-op.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+Anim:pause(char, "Attack")
+
+-- ... perform some game logic ...
+
+Anim:resume(char, "Attack")
+```
+
+<Note>
+  If no speed was stored from a previous `:pause()` call, `:resume()` defaults to restoring speed `1`. This means calling `:resume()` on a track that was never paused will simply set its speed to `1`, which is usually harmless but not the intended usage pattern.
+</Note>

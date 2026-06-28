@@ -1,0 +1,38 @@
+---
+title: "Defining Your Animation List in EZAnim"
+sidebarTitle: "Animation List"
+description: "Learn how the List table maps string keys to Roblox asset IDs and how those keys become the id parameter across every EZAnim API call."
+---
+
+The `List` table is the foundation of every EZAnim setup. It acts as a registry that maps human-readable string keys to Roblox animation asset IDs. Every other API call references these keys by name, so the list you define at initialization becomes the single source of truth for all animations in your service.
+
+## Defining a List
+
+Pass your `List` table to `EZAnim.init()` during setup. Each entry pairs a string key with an `rbxassetid://` URL pointing to a valid Roblox animation asset.
+
+```lua
+local AnimList = {
+    Idle      = "rbxassetid://1234567890",
+    Run       = "rbxassetid://0987654321",
+    Jump      = "rbxassetid://1122334455",
+    Attack    = "rbxassetid://5566778899",
+}
+
+local Anim = EZAnim.init({ List = AnimList })
+```
+
+Once initialized, `Anim` resolves every animation by its key. You never pass raw asset IDs to subsequent calls — only the string keys you defined here.
+
+## Keys as the `id` Parameter
+
+The string keys in your `List` — `"Idle"`, `"Run"`, `"Jump"`, `"Attack"` — are the `id` values you supply to every EZAnim method that targets a specific animation. For example, calling `Anim:play(character, "Run", ...)` tells EZAnim to look up `"Run"` in the list and play the associated asset.
+
+<Tip>
+  Use a consistent naming convention across your entire project. PascalCase (e.g. `"WalkBack"`, `"AttackSpin"`) is a common choice and makes it easier to spot typos in your call sites.
+</Tip>
+
+## Missing Keys
+
+<Note>
+  If you pass an `id` to `:play()` that does not exist in your `List`, the call silently returns `nil` and no animation plays. Always verify that your key names match exactly — including casing — between the list definition and your call sites.
+</Note>

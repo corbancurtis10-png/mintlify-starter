@@ -1,0 +1,42 @@
+---
+title: "Animation Groups for Randomized Playback"
+sidebarTitle: "Groups"
+description: "Learn how to define named animation groups in EZAnim and play a random entry from them to add procedural variety to characters and actions."
+---
+
+Animation groups let you bundle a set of related animation keys under a single name, then play one of them at random with a single call. This removes manual randomization logic from your code and makes it easy to add variety to any repeated action — footsteps, hit reactions, idle fidgets, and more.
+
+## Defining and Playing a Group
+
+Call `:defineGroup()` once to register the group, then call `:playGroup()` whenever you want to play it. EZAnim selects one key from the array at random each time.
+
+```lua
+-- Define a group of walk variants
+Anim:defineGroup("WalkVariants", { "Walk1", "Walk2", "Walk3" })
+
+-- Play a random variant
+Anim:playGroup(character, "WalkVariants")
+```
+
+Every time `:playGroup()` is called, EZAnim picks a different entry from the group, keeping motion feeling natural and less mechanical over repeated plays.
+
+## Use Cases
+
+Groups are especially useful in any situation where repetition would feel robotic:
+
+- **Footstep cycles** — shuffle between two or three subtle walk clips so the stride never looks identical
+- **Hit reactions** — randomize flinch animations so taking damage looks less scripted
+- **Idle fidgets** — cycle through small ambient movements (a glance, a stretch, a weight shift) during long idle periods
+- **Attack combos** — vary the visual of the same gameplay action without changing its mechanical properties
+
+## Keys, Not Asset IDs
+
+<Note>
+  `:defineGroup()` takes an array of **animation key names** — the same string keys you defined in your `List` table — not raw `rbxassetid://` URLs. Make sure every key you include in a group exists in the `List` you passed to `EZAnim.init()`.
+</Note>
+
+## Define Groups at Setup Time
+
+<Tip>
+  Groups are global to the `AnimationService` instance. Define all your groups once during initialization, alongside your `List`, so they are available immediately when gameplay begins and you avoid redundant calls mid-session.
+</Tip>

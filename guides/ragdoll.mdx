@@ -1,0 +1,87 @@
+---
+title: "Ragdoll Physics: Enabling and Recovering"
+sidebarTitle: "Ragdoll"
+description: "Enable physics-based ragdoll on any standard Roblox rig, with optional auto-recovery and manual unragdoll control via EZAnim."
+---
+
+EZAnim's ragdoll system converts a standard Roblox character rig into a physics-driven ragdoll by disabling its `Motor6D` joints, replacing them with `BallSocketConstraint` instances, and setting the `Humanoid` to the `Physics` state. When you're ready to recover the character, `:unragdoll()` reverses every change and returns the humanoid to `GettingUp` state.
+
+## How Ragdoll Works
+
+Calling `:ragdoll()` performs three steps:
+
+1. **Disables all `Motor6D` joints** — this detaches the animated skeleton so the body parts are free to move independently.
+2. **Adds `BallSocketConstraint` instances** — each original joint is replaced with a ball-socket physics constraint that keeps limbs connected while allowing realistic flopping.
+3. **Sets the `Humanoid` to `Physics` state** — this prevents Roblox's built-in character controller from fighting the simulation.
+
+<Note>
+  Ragdoll requires the model to have `Motor6D` joints. Standard Roblox **R6** and **R15** rigs work out of the box.
+</Note>
+
+## Basic Usage
+
+<CodeGroup>
+```lua Timed ragdoll (auto-recover)
+-- Ragdoll for 3 seconds, then automatically recover
+Anim:ragdoll(character, 3)
+```
+
+```lua Indefinite ragdoll
+-- Ragdoll with no time limit — stays until you call unragdoll
+Anim:ragdoll(character)
+
+-- Recover manually when ready
+Anim:unragdoll(character)
+```
+</CodeGroup>
+
+When you pass a `duration`, EZAnim calls `:unragdoll()` automatically after that many seconds using an internal `task.delay`.
+
+## Recovery with unragdoll
+
+`:unragdoll()` reverses everything `:ragdoll()` did:
+
+- Re-enables all `Motor6D` joints.
+- Destroys the `BallSocketConstraint` instances and their `Attachment` pairs.
+- Sets the `Humanoid` back to `GettingUp` state so the character controller resumes.
+
+```lua
+Anim:unragdoll(character)
+```
+
+<Note>
+  After `:unragdoll()`, the `Humanoid` enters `GettingUp` state before transitioning back to idle. This gives a brief stand-up window that you can animate separately if needed.
+</Note>
+
+## Example: Hit Reaction / Knockback
+
+A common pattern is to ragdoll a character on a heavy hit and let them recover after a short window.
+
+```lua
+-- On hit — ragdoll for 2 seconds then auto-recover
+Anim:ragdoll(character, 2)
+```
+
+For more control — for example, keeping a character ragdolled until a revival mechanic triggers — omit the duration and call `:unragdoll()` from your own logic:
+
+```lua
+-- Knocked out — ragdoll until a teammate revives
+Anim:ragdoll(character)
+
+-- Somewhere in your revival system...
+Anim:unragdoll(character)
+Anim:play(character, "GetUp", "Action", false, 0.2)
+```
+
+<Warning>
+  Stop all active animation tracks before calling `:ragdoll()`. Active tracks attempt to drive the `Motor6D` joints each frame, which can fight the physics simulation and produce jittery results.
+
+  ```lua
+  Anim:stopAll(character, 0)
+  Anim:ragdoll(character, 3)
+  ```
+</Warning>
+
+<Tip>
+  Pair timed ragdoll with a screen-shake or impact sound on the same frame for a polished hit-response feel — the ragdoll duration gives you a natural window to play recovery SFX or UI feedback.
+</Tip>

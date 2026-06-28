@@ -1,0 +1,34 @@
+---
+title: "Define an Animation Group in EZAnim — defineGroup()"
+sidebarTitle: "defineGroup"
+description: "Register a named group of animation keys so you can play a random animation from that set later using playGroup(), ideal for varied reactions."
+---
+
+The `defineGroup` method registers a named collection of animation keys under a single group name. Once defined, you can pass that group name to `:playGroup()` to have EZAnim automatically pick and play a random animation from the set. This is useful whenever you want natural variation — hit reactions, idle fidgets, crowd noise emotes, or any situation where playing the same clip every time would feel repetitive.
+
+<ParamField path="name" type="string" required>
+  A unique identifier for this group. You will pass this same string to `:playGroup()` later.
+</ParamField>
+
+<ParamField path="list" type="table" required>
+  An array of animation key strings. Each entry must be a key from your animation List table — not a raw Roblox asset ID.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Define a group of hit reaction animations at initialization
+Anim:defineGroup("HitReactions", { "HitLeft", "HitRight", "HitBack" })
+```
+
+<Tip>
+  Define all groups once during initialization (e.g., inside a script's top-level scope or a setup function) before any gameplay starts. Calling `defineGroup` mid-gameplay with the same name overwrites the previous group silently.
+</Tip>
+
+<Note>
+  The entries in `list` are animation key names from your List table, not raw Roblox asset IDs. Make sure every key you include has a corresponding entry in your animation list or it will fail to load when selected by `:playGroup()`.
+</Note>

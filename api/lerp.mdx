@@ -1,0 +1,74 @@
+---
+title: "Lerp a Part or Model Through 3D Space in EZAnim — lerp()"
+sidebarTitle: "lerp"
+description: "Smoothly interpolate a BasePart or Model between two Vector3 or CFrame values over a set duration, with optional custom easing, using RunService.Heartbeat."
+---
+
+The `lerp` method moves a `BasePart` or `Model` from one position or orientation to another over a specified duration, sampling the interpolation every `Heartbeat` frame. You provide a start value, an end value, and a duration. Optionally, you can supply a custom easing function that maps a linear alpha (0→1) to a custom curve — quadratic, cubic, bounce, spring, or anything you write. When alpha reaches `1` the connection disconnects automatically and the object rests at the final value.
+
+<ParamField path="instance" type="Instance" required>
+  The `BasePart` or `Model` to move. For a `BasePart`, position or `CFrame` is set directly. For a `Model`, the pivot is moved via `:PivotTo()`.
+</ParamField>
+
+<ParamField path="fromValue" type="Vector3 | CFrame" required>
+  The starting position (`Vector3`) or transform (`CFrame`). The instance is snapped to this value at the first frame.
+</ParamField>
+
+<ParamField path="toValue" type="Vector3 | CFrame" required>
+  The target position (`Vector3`) or transform (`CFrame`). Must match the type of `fromValue`.
+</ParamField>
+
+<ParamField path="duration" type="number" required>
+  How long the interpolation should take, in seconds.
+</ParamField>
+
+<ParamField path="alphaFn" type="function">
+  An optional easing function with the signature `(alpha: number) -> number`. Receives the raw linear alpha (0–1) and returns the eased alpha. Defaults to linear (`function(a) return a end`).
+</ParamField>
+
+## Returns
+
+<ResponseField name="RBXScriptConnection" type="RBXScriptConnection">
+  The `RunService.Heartbeat` connection driving the interpolation. It disconnects automatically when the lerp completes. You can disconnect it early to abort the movement.
+</ResponseField>
+
+## Examples
+
+```lua
+-- Move a part from the origin to a target position in 1 second (linear)
+Anim:lerp(part, Vector3.new(0, 0, 0), Vector3.new(10, 5, 0), 1)
+```
+
+```lua
+-- Quadratic ease-in
+Anim:lerp(part, Vector3.new(0, 0, 0), Vector3.new(10, 0, 0), 1, function(a)
+    return a * a
+end)
+```
+
+```lua
+-- CFrame lerp with rotation on a model (moves and rotates simultaneously)
+Anim:lerp(
+    model,
+    CFrame.new(0, 0, 0),
+    CFrame.new(10, 0, 0) * CFrame.Angles(0, math.pi, 0),
+    2
+)
+```
+
+```lua
+-- Abort a lerp early
+local connection = Anim:lerp(part, Vector3.new(0, 0, 0), Vector3.new(50, 0, 0), 5)
+
+task.delay(2, function()
+    connection:Disconnect()  -- stop halfway
+end)
+```
+
+<Note>
+  When passing a `Vector3`, EZAnim sets `BasePart.Position` (for parts) or calls `Model:PivotTo(CFrame.new(value))` (for models). When passing a `CFrame`, it sets `BasePart.CFrame` or calls `Model:PivotTo(value)` directly.
+</Note>
+
+<Tip>
+  For animating non-positional properties like transparency, size, or color, use `:tween()` instead. `lerp` is purpose-built for spatial movement in world space.
+</Tip>

@@ -1,0 +1,135 @@
+---
+title: "EZAnim Setup: Installation and Project Configuration"
+sidebarTitle: "Setup"
+description: "Learn where to place EZAnim in your Roblox project, how to require it from any script type, and how to structure your animation list correctly."
+---
+
+Before you can call any EZAnim methods you need to place the module in the right location, require it from your scripts, and supply a well-formed animation list. This page walks through each of those steps and explains the reasoning behind each recommendation so you can adapt the setup to your own project structure.
+
+## Where to place EZAnim.luau
+
+Roblox scripts can only `require` modules that are accessible to them in the DataModel hierarchy. Where you place `EZAnim.luau` determines which scripts can use it:
+
+| Location | Accessible from |
+|---|---|
+| `ReplicatedStorage` | `LocalScript` (client) and `Script` (server) |
+| `ServerScriptService` | `Script` (server only) |
+| `StarterPlayerScripts` | `LocalScript` running under that player only |
+
+**`ReplicatedStorage` is the recommended location** for most games because it lets both the client and server share the same module without duplication. If your animations are strictly server-side (for example, NPC logic with no client prediction), `ServerScriptService` is a reasonable alternative.
+
+In Roblox Studio, create a `ModuleScript` directly inside `ReplicatedStorage`, rename it `EZAnim`, and paste the contents of `EZAnim.luau` into it.
+
+## Requiring EZAnim from a Script vs LocalScript
+
+The require call is identical in both script types — only the path changes based on your project layout.
+
+<CodeGroup>
+```lua LocalScript (client)
+-- Runs on the client, e.g. in StarterCharacterScripts or StarterPlayerScripts
+local EZAnim = require(game.ReplicatedStorage.EZAnim)
+```
+
+```lua Script (server)
+-- Runs on the server, e.g. in ServerScriptService
+local EZAnim = require(game.ReplicatedStorage.EZAnim)
+```
+</CodeGroup>
+
+<Warning>
+  Never require a module stored in `ServerScriptService` from a `LocalScript`. The client cannot access `ServerScriptService` contents, and the require call will throw an error at runtime.
+</Warning>
+
+## Structuring your animation list
+
+The `List` table you pass to `EZAnim.init` is the single source of truth for every animation in your service instance. Each entry maps a **string key** to a **Roblox animation asset ID** in the format `rbxassetid://NUMERICALID`.
+
+```lua
+local AnimList = {
+    -- Locomotion
+    Idle       = "rbxassetid://1234567890",
+    Walk       = "rbxassetid://1234567891",
+    Run        = "rbxassetid://1234567892",
+    Jump       = "rbxassetid://1234567893",
+    Fall       = "rbxassetid://1234567894",
+
+    -- Combat
+    Punch      = "rbxassetid://1234567895",
+    Block      = "rbxassetid://1234567896",
+    Stagger    = "rbxassetid://1234567897",
+
+    -- Emotes
+    Wave       = "rbxassetid://1234567898",
+    Sit        = "rbxassetid://1234567899",
+}
+
+local Anim = EZAnim.init({ List = AnimList })
+```
+
+Keep these conventions in mind when naming your keys:
+
+- Use **PascalCase** keys (`Idle`, `RunFast`) — they read clearly at the call site and avoid clashes with Lua reserved words.
+- Group related animations together in your source code using comments; EZAnim treats all keys identically regardless of order.
+- You can have as many keys as your game needs. EZAnim only loads a track when you explicitly call a playback method, so a large list has no upfront performance cost.
+
+## Recommended project structure
+
+Below is a folder layout that keeps animation management organised as your project grows. Separating the animation list into its own `ModuleScript` (`AnimationList`) makes it easy to update asset IDs without touching the scripts that drive playback logic.
+
+```
+ReplicatedStorage/
+├── EZAnim          (ModuleScript — the EZAnim library)
+└── AnimationList   (ModuleScript — your List table, required by game scripts)
+
+StarterCharacterScripts/
+└── AnimationController  (LocalScript — requires EZAnim and AnimationList, drives playback)
+
+ServerScriptService/
+└── NPCController   (Script — requires EZAnim and AnimationList for NPC animations)
+```
+
+With this layout your `LocalScript` looks like this:
+
+```lua
+-- StarterCharacterScripts/AnimationController
+local EZAnim       = require(game.ReplicatedStorage.EZAnim)
+local AnimList     = require(game.ReplicatedStorage.AnimationList)
+
+local Anim = EZAnim.init({ List = AnimList })
+
+local character = game.Players.LocalPlayer.Character
+    or game.Players.LocalPlayer.CharacterAdded:Wait()
+
+Anim:play(character, "Idle", "Idle", true, 0.15)
+```
+
+## Automatic Animator creation
+
+<Note>
+  EZAnim checks for an `Animator` instance under the character's `Humanoid` each time you call a playback method. If one does not exist, EZAnim creates it automatically. You do not need to add an `Animator` to your characters manually before using EZAnim.
+</Note>
+
+## Cleaning up on character removal
+
+Every model you pass to EZAnim accumulates internal state — loaded animation tracks, queued animations, event connections, and state values. Release that state by calling `Anim:destroy(model)` when the model is removed from the game.
+
+```lua
+-- Server-side example: clean up when a player's character is removed
+game.Players.PlayerRemoving:Connect(function(player)
+    local character = player.Character
+    if character then
+        Anim:destroy(character)
+    end
+end)
+```
+
+```lua
+-- Client-side example: clean up before the character respawns
+game.Players.LocalPlayer.CharacterRemoving:Connect(function(character)
+    Anim:destroy(character)
+end)
+```
+
+<Warning>
+  Skipping `destroy` will cause memory leaks over long play sessions, especially in games where characters spawn and despawn frequently (round-based games, team deathmatch, etc.). Always pair each character lifecycle with a `destroy` call.
+</Warning>

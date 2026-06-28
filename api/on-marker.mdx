@@ -1,0 +1,55 @@
+---
+title: "Listen for Keyframe Markers in EZAnim — onMarker()"
+sidebarTitle: "onMarker"
+description: "Connect a callback to fire when a named keyframe marker is reached in an animation, enabling precise timing for hit detection, VFX, and sound cues."
+---
+
+The `onMarker` method connects a callback function to the `GetMarkerReachedSignal` event of a loaded `AnimationTrack`, firing your function at the exact moment the playhead crosses the named marker. Markers are created in the Roblox Animation Editor using the **Add Marker** option on a keyframe. This is the recommended pattern for syncing gameplay events — hit detection, particle effects, sound cues, screen shake — to a precise point in an animation rather than using fragile timed delays.
+
+<ParamField path="model" type="Model" required>
+  The character or model that is playing the animation.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key whose track you want to attach the marker listener to.
+</ParamField>
+
+<ParamField path="marker" type="string" required>
+  The exact name of the keyframe marker as set in the Roblox Animation Editor.
+</ParamField>
+
+<ParamField path="callback" type="function" required>
+  The function to call when the marker is reached. Receives no arguments by default unless a value was set on the marker in the editor.
+</ParamField>
+
+## Returns
+
+<ResponseField name="RBXScriptConnection | nil" type="RBXScriptConnection | nil">
+  The script connection, or `nil` if the animation track for `id` is not yet loaded on this model.
+</ResponseField>
+
+## Example
+
+```lua
+-- Connect damage logic to a named marker
+Anim:play(char, "Swing", "Action", false)
+Anim:onMarker(char, "Swing", "HitFrame", function()
+    dealDamage()
+end)
+```
+
+```lua
+-- Spawn a particle effect at the moment of impact
+Anim:play(char, "Slam", "Action", false)
+Anim:onMarker(char, "Slam", "Impact", function()
+    spawnShockwave(char.HumanoidRootPart.Position)
+end)
+```
+
+<Note>
+  The animation must have been played at least once (and thus loaded) before you call `onMarker`. The safest pattern is to call `onMarker` immediately after `:play()` on the same frame. If the track is not loaded, this method returns `nil` and no connection is made.
+</Note>
+
+<Tip>
+  EZAnim stores every connection created by `onMarker` and automatically disconnects them when `:destroy()` is called. You only need to manually disconnect if you want to remove the listener before the service is destroyed.
+</Tip>

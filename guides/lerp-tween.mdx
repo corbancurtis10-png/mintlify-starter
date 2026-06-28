@@ -1,0 +1,128 @@
+---
+title: "Moving Instances with Lerp and Tween Helpers"
+sidebarTitle: "Lerp & Tween"
+description: "EZAnim bundles Tween and Lerp helpers so you can animate parts and models without managing TweenService or Heartbeat connections yourself."
+---
+
+EZAnim ships two motion helpers alongside its animation API. `:tween()` wraps Roblox's `TweenService` for property-based animations, and `:lerp()` provides a frame-by-frame interpolation loop for smoothly moving `BasePart` positions or `CFrame` values with an optional custom easing function.
+
+---
+
+## Tween
+
+`:tween()` creates a `Tween` via `TweenService:Create()` and immediately calls `:Play()` on it, saving you the two-step boilerplate.
+
+```lua
+AnimationService:tween(instance, info, goal) -> Tween
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `instance` | `Instance` | The object whose properties you want to animate |
+| `info` | `TweenInfo` | Speed, easing style, direction, repeat, and delay settings |
+| `goal` | `table` | Property–value pairs to animate toward |
+
+```lua
+local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+Anim:tween(part, tweenInfo, { Transparency = 1 })
+```
+
+The call returns the `Tween` object already in a playing state. Store it if you need to pause, cancel, or listen to `Completed`.
+
+```lua
+local t = Anim:tween(part, TweenInfo.new(1), { Size = Vector3.new(4, 4, 4) })
+t.Completed:Connect(function()
+    print("Tween finished!")
+end)
+```
+
+<Tip>
+  Use `:tween()` whenever you're animating standard instance properties like `Transparency`, `Size`, `Color`, or `CFrame` on a `BasePart`. TweenService is physics-safe and integrates with Roblox's render pipeline.
+</Tip>
+
+---
+
+## Lerp
+
+`:lerp()` runs a `RunService.Heartbeat`-driven interpolation loop that moves a `BasePart` (via `Position`) or a `Model` (via `PivotTo`) between two values over a set duration. It disconnects the loop automatically when the interpolation completes.
+
+```lua
+AnimationService:lerp(instance, fromValue, toValue, duration, alphaFn) -> RBXScriptConnection
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `instance` | `BasePart` \| `Model` | The object to move |
+| `fromValue` | `Vector3` \| `CFrame` | Starting position or orientation |
+| `toValue` | `Vector3` \| `CFrame` | Ending position or orientation |
+| `duration` | `number` | Interpolation time in seconds |
+| `alphaFn` | `(a: number) -> number` | *(Optional)* Custom easing function; defaults to linear |
+
+### Vector3 Lerp
+
+Pass `Vector3` values to move the `BasePart`'s `Position` property.
+
+```lua
+local from = Vector3.new(0, 0, 0)
+local to   = Vector3.new(10, 5, 0)
+
+-- Linear lerp over 1 second
+Anim:lerp(part, from, to, 1)
+```
+
+### Custom Easing
+
+Supply an `alphaFn` to replace the default linear easing with any curve you want. The function receives the current normalised time `a` (0 → 1) and returns a remapped value.
+
+```lua
+-- Ease-in cubic
+Anim:lerp(part, from, to, 1, function(a)
+    return a * a * a
+end)
+
+-- Ease-out quadratic
+Anim:lerp(part, from, to, 1, function(a)
+    return 1 - (1 - a) * (1 - a)
+end)
+```
+
+### CFrame Lerp
+
+Pass `CFrame` values to interpolate both position and orientation simultaneously. `:lerp()` detects the `CFrame` type and uses `PivotTo` on `Model` instances or sets the `CFrame` property directly on `BasePart`.
+
+```lua
+local fromCF = CFrame.new(0, 0, 0)
+local toCF   = CFrame.new(10, 0, 0) * CFrame.Angles(0, math.pi, 0)
+
+-- CFrame lerp over 2 seconds (works on BasePart and Model)
+Anim:lerp(model, fromCF, toCF, 2)
+```
+
+### Return Value
+
+`:lerp()` returns the `RBXScriptConnection` for the `Heartbeat` loop. You can disconnect it early to stop the lerp mid-way.
+
+```lua
+local connection = Anim:lerp(part, from, to, 5)
+
+-- Cancel the lerp after 1 second
+task.delay(1, function()
+    connection:Disconnect()
+end)
+```
+
+<Note>
+  Because `:lerp()` drives position on every `Heartbeat` frame, it bypasses Roblox's physics solver. For very large distances or physics-simulated parts, use `:tween()` instead — `TweenService` coordinates with the physics engine to avoid conflicts.
+</Note>
+
+---
+
+## Choosing Between Lerp and Tween
+
+| | `:tween()` | `:lerp()` |
+|---|---|---|
+| **Best for** | Instance properties (`Transparency`, `Size`, `Color`, `CFrame`) | Position / CFrame movement with custom easing curves |
+| **Easing** | Roblox built-in `EasingStyle` enums | Any function `(a) -> a` |
+| **Physics-safe** | ✅ Yes | ⚠️ Not for simulated parts |
+| **Return value** | `Tween` (already playing) | `RBXScriptConnection` (auto-disconnects) |
+| **Cancel early** | `tween:Cancel()` | `connection:Disconnect()` |

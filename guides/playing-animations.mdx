@@ -1,0 +1,122 @@
+---
+title: "Playing, Stopping, and Pausing Animations"
+sidebarTitle: "Playing Animations"
+description: "Learn how to play, stop, pause, and resume animations on Roblox character models using EZAnim's core animation API."
+---
+
+EZAnim gives you a straightforward API for driving character animations on any Roblox model that has a `Humanoid`. You play animations by ID, control how they blend in and out with fade times, and pause or resume them at any point — all through a single service instance.
+
+## Playing an Animation
+
+Use `:play()` to start an animation on a model. The method accepts the model, an animation ID key, an animation type, a looped flag, and a fade-in time.
+
+```lua
+AnimationService:play(model, id, animType, looped, fadeTime) -> AnimationTrack
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | `Model` | — | The character model to animate |
+| `id` | `string` | — | Key from your `List` table (e.g. `"Idle"`) |
+| `animType` | `string` | `"Movement"` | One of `"Idle"`, `"Movement"`, `"Action"`, `"Action2"`, `"Action3"`, `"Action4"` (case-insensitive) |
+| `looped` | `boolean` | `false` | Whether the animation loops continuously |
+| `fadeTime` | `number` | `0.15` | Blend-in duration in seconds |
+
+`:play()` returns the `AnimationTrack`, or `nil` if the ID is not in your `List` or the model has no `Humanoid`. If the animation is already playing, it returns the existing track without restarting it.
+
+### Looped vs. Non-Looped
+
+Pass `true` for `looped` when the animation should repeat indefinitely (e.g. idle stances, movement cycles). Pass `false` for one-shot animations like attacks or emotes.
+
+```lua
+local Anim = EZAnim.init({ List = {
+    Idle = "rbxassetid://1111111111",
+    Run  = "rbxassetid://2222222222",
+}})
+
+local char = game.Players.LocalPlayer.Character
+
+-- Looping idle — plays continuously until stopped
+Anim:play(char, "Idle", "Idle", true, 0.15)
+
+-- Non-looping action — plays once then stops on its own
+Anim:play(char, "Attack", "Action", false, 0.1)
+```
+
+## Stopping Animations
+
+### Stop a Specific Animation
+
+Use `:stop()` to stop a single animation track by its ID. The `fadeTime` parameter controls how quickly the animation blends out.
+
+```lua
+AnimationService:stop(model, id, fadeTime)
+```
+
+### Stop All Animations
+
+Use `:stopAll()` to stop every animation currently playing on the model in one call.
+
+```lua
+AnimationService:stopAll(model, fadeTime)
+```
+
+## Pausing and Resuming
+
+`:pause()` sets the track's speed to `0` and stores the previous speed internally. `:resume()` restores that stored speed, picking up exactly where it left off.
+
+```lua
+AnimationService:pause(model, id)
+AnimationService:resume(model, id)
+```
+
+<Note>
+  Pausing does not reset the animation's time position. When you resume, playback continues from the exact frame it was paused on.
+</Note>
+
+## Practical Example: Idle → Run Transition
+
+The snippet below shows a typical character locomotion flow — starting a looping idle, switching to a run, stopping everything, and demonstrating a pause/resume cycle.
+
+```lua
+local Anim = EZAnim.init({ List = {
+    Idle = "rbxassetid://1111111111",
+    Run  = "rbxassetid://2222222222",
+}})
+
+local char = game.Players.LocalPlayer.Character
+
+-- Play a looping idle
+Anim:play(char, "Idle", "Idle", true, 0.15)
+
+-- Switch to run
+Anim:stop(char, "Idle", 0.2)
+Anim:play(char, "Run", "Movement", true, 0.2)
+
+-- Stop everything
+Anim:stopAll(char, 0.3)
+
+-- Pause and resume
+Anim:pause(char, "Run")
+task.wait(2)
+Anim:resume(char, "Run")
+```
+
+<Steps>
+  <Step title="Initialize EZAnim with your animation list">
+    Pass a `List` table mapping string keys to `rbxassetid://` strings when calling `EZAnim.init()`. These keys are what you pass as `id` in every subsequent call.
+  </Step>
+  <Step title="Play a looping idle animation">
+    Call `:play()` with `looped = true` and `animType = "Idle"` so Roblox's animator blends it at the correct priority level.
+  </Step>
+  <Step title="Transition to a movement animation">
+    Stop the idle with a short `fadeTime`, then immediately play the run animation. The overlapping fade windows create a smooth blend.
+  </Step>
+  <Step title="Clean up with stopAll">
+    When the character becomes inactive (e.g. sits down, dies), call `:stopAll()` to clear every active track at once.
+  </Step>
+</Steps>
+
+<Tip>
+  Use `animType` to match Roblox's built-in animation priority levels. `"Action"` plays on top of `"Movement"`, which plays on top of `"Idle"` — so an attack animation set to `"Action"` won't be overridden by a running cycle.
+</Tip>

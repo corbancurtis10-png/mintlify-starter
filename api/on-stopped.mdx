@@ -1,0 +1,52 @@
+---
+title: "Listen for Animation End in EZAnim — onStopped()"
+sidebarTitle: "onStopped"
+description: "Register a one-time callback that fires when a specific animation stops playing, making it easy to chain transitions, reset state, or trigger follow-up logic."
+---
+
+The `onStopped` method connects a callback to the `Stopped` event of a loaded `AnimationTrack`, firing your function exactly once when that animation finishes or is manually stopped. This is the cleanest way to sequence animation-driven logic: clear a state flag, queue the next animation, re-enable input, or fade back into an idle — all triggered precisely when the clip ends rather than after an arbitrary wait.
+
+<ParamField path="model" type="Model" required>
+  The character or model that is playing the animation.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key whose track you want to watch for completion.
+</ParamField>
+
+<ParamField path="callback" type="function" required>
+  The function to call when the animation stops. Receives no arguments.
+</ParamField>
+
+## Returns
+
+<ResponseField name="RBXScriptConnection | nil" type="RBXScriptConnection | nil">
+  The script connection, or `nil` if the animation track for `id` is not yet loaded on this model.
+</ResponseField>
+
+## Example
+
+```lua
+-- Return to idle and clear state after an attack finishes
+Anim:play(char, "Attack", "Action", false)
+Anim:onStopped(char, "Attack", function()
+    Anim:setState(char, nil)
+    Anim:play(char, "Idle", "Idle", true, 0.2)
+end)
+```
+
+```lua
+-- Re-enable a UI button once an emote finishes
+Anim:play(char, "Wave", "Action", false)
+Anim:onStopped(char, "Wave", function()
+    emoteButton.Active = true
+end)
+```
+
+<Note>
+  Like `onMarker`, the animation must be loaded before calling `onStopped`. Call it immediately after `:play()` to guarantee the track exists. If the track is not found, this method returns `nil`.
+</Note>
+
+<Tip>
+  EZAnim stores and automatically disconnects all connections created by `onStopped` when `:destroy()` is called, so you do not need to manage connection cleanup manually in most cases.
+</Tip>

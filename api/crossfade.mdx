@@ -1,0 +1,55 @@
+---
+title: "AnimationService:crossFade() — Blend Between Animations"
+sidebarTitle: "CrossFade"
+description: "Smoothly transition from one animation to another in a single call, fading the outgoing track out and the incoming track in over a shared blend duration."
+---
+
+`AnimationService:crossFade()` transitions from one playing animation to another in a single, coordinated call. Rather than abruptly cutting between animations or manually chaining `:stop()` and `:play()`, you provide a source key, a target key, and a blend duration — EZAnim fades the outgoing animation out and the incoming animation in over the same time window, producing a smooth visual transition. This is the preferred way to switch between locomotion states such as idle, walking, and running.
+
+## Signature
+
+```lua
+AnimationService:crossFade(model, fromId, toId, time) -> AnimationTrack | nil
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The model on which to perform the animation transition. The model must have a `Humanoid` and at least have the `fromId` animation accessible through this instance's `List`.
+</ParamField>
+
+<ParamField path="fromId" type="string" required>
+  The animation key to stop. This animation will be faded out over the duration specified by `time`.
+</ParamField>
+
+<ParamField path="toId" type="string" required>
+  The animation key to start. This animation will be faded in over the duration specified by `time`.
+</ParamField>
+
+<ParamField path="time" type="number">
+  The blend duration in seconds. This same value is used for both the fade-out of `fromId` and the fade-in of `toId`. Defaults to `0.15`.
+</ParamField>
+
+## Returns
+
+<ResponseField name="AnimationTrack" type="AnimationTrack | nil">
+  The new `AnimationTrack` for the `toId` animation, or `nil` if the transition could not be performed (for example, if the model is invalid or `toId` is not in the list).
+</ResponseField>
+
+## Example
+
+```lua
+-- Smoothly transition from Idle to Run over 0.25 seconds
+Anim:crossFade(char, "Idle", "Run", 0.25)
+
+-- Transition back when the player stops moving
+Anim:crossFade(char, "Run", "Idle", 0.25)
+```
+
+<Note>
+  The new animation (`toId`) plays with a default `animType` of `"Movement"` and `looped = false` unless those values were previously configured for that key. If you need more control over priority or looping, call `:stop()` and `:play()` separately with explicit arguments.
+</Note>
+
+<Tip>
+  Use `:crossFade()` instead of manually calling `:stop()` followed by `:play()` whenever you are switching between animations. The coordinated blend produces a noticeably smoother result, particularly for locomotion cycles.
+</Tip>

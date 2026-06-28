@@ -1,47 +1,96 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Quickstart: Play Your First Animation with EZAnim"
+sidebarTitle: "Quickstart"
+description: "Follow this five-step walkthrough to install EZAnim, register your animations, and call your first play method in a Roblox LocalScript or Script."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+This guide takes you from a fresh Roblox project to a live animation playing on a character model. Each step builds directly on the previous one, so work through them in order. By the end you will have a working EZAnim setup you can expand into a full animation system.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Get EZAnim">
+    Copy `EZAnim.luau` into your Roblox project. For most projects, `ReplicatedStorage` is the right location because both the client and the server can require modules stored there. If you only need animations on the server, place it inside `ServerScriptService` instead.
 
-    ```bash
-    npm install your-package
-    ```
+    In Roblox Studio, create a new `ModuleScript` inside `ReplicatedStorage`, rename it `EZAnim`, and paste the contents of `EZAnim.luau` into it.
+
+    <Tip>
+      Keep `EZAnim` at the top level of `ReplicatedStorage` so the require path stays short and predictable across all your scripts.
+    </Tip>
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+  <Step title="Require the module">
+    At the top of your `LocalScript` (or `Script`), require `EZAnim` using its full instance path.
 
-    ```bash
-    your-cli init
+    ```lua
+    local EZAnim = require(game.ReplicatedStorage.EZAnim)
     ```
+
+    `EZAnim` is now a table containing the `init` constructor and all service methods. Nothing runs until you call `init`.
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Create your animation list">
+    Define a table that maps short, readable string keys to Roblox animation asset IDs. These keys are what you pass to every EZAnim method — choose names that describe what the animation looks like, not implementation details.
 
-    ```bash
-    your-cli start
+    ```lua
+    local AnimList = {
+        Idle = "rbxassetid://1234567890",
+        Run  = "rbxassetid://0987654321",
+        Jump = "rbxassetid://1122334455",
+    }
     ```
+
+    Replace each asset ID with a real animation asset ID from your Roblox game. You can find asset IDs in the **Toolbox** or on the **Creator Hub** under your uploaded animations.
+  </Step>
+  <Step title="Initialize EZAnim">
+    Call `EZAnim.init` and pass your animation list inside an options table. Store the returned service object — you will use it for every animation call in your project.
+
+    ```lua
+    local Anim = EZAnim.init({
+        List = AnimList
+    })
+    ```
+
+    `init` registers all animations internally and returns a service instance bound to that list. Create one instance per animation set (for example, one for players and one for NPCs if they use different animation libraries).
+  </Step>
+  <Step title="Play an animation">
+    Retrieve a character model and call `Anim:play`. Pass the model, the animation key, the priority level, whether the animation loops, and a fade-in time in seconds.
+
+    ```lua
+    local character = game.Players.LocalPlayer.Character
+        or game.Players.LocalPlayer.CharacterAdded:Wait()
+
+    Anim:play(character, "Idle", "Idle", true, 0.15)
+    ```
+
+    `play` loads the animation onto the character's `Humanoid`, starts playback, and returns the live `AnimationTrack` in case you need to inspect or manipulate it further.
+
+    <Note>
+      Always wait for `Character` to exist before calling any EZAnim method. Using `CharacterAdded:Wait()` as a fallback (shown above) prevents errors when the script runs before the character has loaded.
+    </Note>
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Complete example
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+The script below combines every step into a single, copy-pasteable `LocalScript`. Drop it into `StarterCharacterScripts` to run it automatically whenever a player's character spawns.
+
+```lua
+-- LocalScript in StarterCharacterScripts
+
+local EZAnim = require(game.ReplicatedStorage.EZAnim)
+
+local Anim = EZAnim.init({
+    List = {
+        Idle = "rbxassetid://1234567890",
+        Run  = "rbxassetid://0987654321",
+        Jump = "rbxassetid://1122334455",
+    }
+})
+
+local character = game.Players.LocalPlayer.Character
+    or game.Players.LocalPlayer.CharacterAdded:Wait()
+
+-- Play a looping idle animation with a 0.15-second fade-in
+Anim:play(character, "Idle", "Idle", true, 0.15)
+```
+
+<Tip>
+  Once you have the basics working, explore `Anim:queue`, `Anim:crossFade`, and `Anim:setState` to build more sophisticated animation logic. See the Guides section for step-by-step walkthroughs of each feature.
 </Tip>

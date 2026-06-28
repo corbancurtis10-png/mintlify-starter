@@ -1,0 +1,47 @@
+---
+title: "Restore a Ragdolled Character in EZAnim — unragdoll()"
+sidebarTitle: "unragdoll"
+description: "Re-enable all Motor6D joints, remove ragdoll constraints, and restore Humanoid controls to bring a physics-ragdolled character back to an animated state."
+---
+
+The `unragdoll` method reverses everything that `:ragdoll()` did. It re-enables all `Motor6D` joints that were stored during ragdolling, destroys the `BallSocketConstraint` and `Attachment` instances that replaced them, restores `Humanoid.PlatformStand` to `false` and `AutoRotate` to `true`, and sets the `Humanoid` state to `GettingUp`. After this call the character is fully animated again and ready to play movement or recovery animations.
+
+<ParamField path="model" type="Model" required>
+  The character model to restore. Must be the same model passed to a previous `:ragdoll()` call.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Basic recovery
+Anim:unragdoll(character)
+```
+
+```lua
+-- Unragdoll then play a get-up animation
+Anim:unragdoll(character)
+Anim:play(character, "GetUp", "Action", false, 0.1)
+```
+
+```lua
+-- Unragdoll as part of a respawn flow
+local function onRespawn(char)
+    Anim:reset(char)
+    if isRagdolled(char) then
+        Anim:unragdoll(char)
+    end
+    Anim:play(char, "Idle", "Idle", true, 0.2)
+end
+```
+
+<Note>
+  If the model is not currently ragdolled, `unragdoll` does nothing and returns safely. You do not need to guard the call with a separate "is ragdolled" check, though you may want one if you need to conditionally play a get-up animation.
+</Note>
+
+<Tip>
+  After unragdolling, the `Humanoid` state is set to `GettingUp`. Play a dedicated get-up animation immediately after the call so the transition from physics simulation back to locomotion looks natural rather than snapping directly into an idle pose.
+</Tip>

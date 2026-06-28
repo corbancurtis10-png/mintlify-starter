@@ -1,0 +1,94 @@
+---
+title: "Responding to Animation Events and Markers"
+sidebarTitle: "Events"
+description: "Use EZAnim's onMarker and onStopped callbacks to sync game logic — hit detection, sound cues, and state changes — directly to animation frames."
+---
+
+EZAnim exposes two event helpers that let your game logic respond to what's happening inside an animation track. Use `:onMarker()` to fire a callback at a specific named keyframe, and `:onStopped()` to react the moment an animation finishes playing.
+
+## onMarker
+
+`:onMarker()` fires a callback when the animation reaches a named marker that you placed in the **Roblox Animation Editor**. This is the correct way to sync gameplay events — like dealing damage or playing a sound effect — to an exact frame rather than estimating with `task.wait`.
+
+```lua
+AnimationService:onMarker(model, id, marker, callback) -> RBXScriptConnection
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `model` | `Model` | The character model |
+| `id` | `string` | Key of the animation in your `List` |
+| `marker` | `string` | Name of the keyframe marker (must match exactly) |
+| `callback` | `function` | Called when the marker is reached |
+
+```lua
+-- React to an animation marker (e.g. "HitFrame" set in the Roblox Animation Editor)
+Anim:onMarker(char, "Attack", "HitFrame", function()
+    -- Deal damage at this exact frame
+    print("Hit frame reached!")
+end)
+```
+
+<Note>
+  The marker name must match exactly — including capitalisation — the name you gave it inside the Roblox Animation Editor. If the callback never fires, double-check the marker name in the editor.
+</Note>
+
+## onStopped
+
+`:onStopped()` fires a callback when the animation track stops, whether it finished naturally, was stopped manually, or was interrupted.
+
+```lua
+AnimationService:onStopped(model, id, callback) -> RBXScriptConnection
+```
+
+```lua
+-- React when an animation finishes
+Anim:onStopped(char, "Attack", function()
+    Anim:play(char, "Idle", "Idle", true, 0.2)
+end)
+```
+
+This is the right hook for returning a character to an idle state after a one-shot action animation completes, without any polling or timing guesswork.
+
+## Full Example: Attack with Hit Detection
+
+The snippet below connects both events to a single attack animation — dealing damage on the hit frame and returning the character to idle when the swing finishes.
+
+```lua
+-- Play the attack animation
+Anim:play(char, "Attack", "Action", false, 0.1)
+
+-- React to an animation marker (e.g. "HitFrame" marker set in Roblox Animation Editor)
+Anim:onMarker(char, "Attack", "HitFrame", function()
+    -- Deal damage at this exact frame
+    print("Hit frame reached!")
+end)
+
+-- React when the animation finishes
+Anim:onStopped(char, "Attack", function()
+    Anim:play(char, "Idle", "Idle", true, 0.2)
+end)
+```
+
+<Steps>
+  <Step title="Add a marker in the Roblox Animation Editor">
+    Open your attack animation, navigate to the frame where the hit should register, right-click the timeline, and add a keyframe marker. Give it a clear name like `"HitFrame"`.
+  </Step>
+  <Step title="Play the animation">
+    Call `:play()` with `looped = false` so the `Stopped` event fires when the animation completes.
+  </Step>
+  <Step title="Connect onMarker for gameplay logic">
+    Call `:onMarker()` with the exact marker name. Your callback runs at that precise frame — ideal for hitbox checks, particle bursts, or impact sounds.
+  </Step>
+  <Step title="Connect onStopped to restore state">
+    Call `:onStopped()` to transition back to your default idle or movement animation once the action finishes.
+  </Step>
+</Steps>
+
+<Note>
+  Both `:onMarker()` and `:onStopped()` return an `RBXScriptConnection`. EZAnim stores these connections internally and disconnects them automatically when `destroy()` is called on the service. You only need to manage the connection manually if you want to disconnect before the service is destroyed.
+</Note>
+
+<Tip>
+  Use `:onMarker()` for hit detection, footstep sounds, muzzle flash effects, and any other visual or gameplay cue that needs to land on a specific frame. It is far more reliable than timing with `task.wait`.
+</Tip>

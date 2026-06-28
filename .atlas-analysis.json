@@ -1,0 +1,139 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "EZAnim",
+  "projectDescription": "A Luau animation service library for Roblox that provides a simple API for playing, queuing, blending, and managing character animations with ragdoll physics support.",
+  "theme": "almond",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "setup"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/animation-list",
+              "concepts/priorities",
+              "concepts/state-system",
+              "concepts/groups"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/playing-animations",
+              "guides/queuing",
+              "guides/crossfade",
+              "guides/ragdoll",
+              "guides/events",
+              "guides/lerp-tween"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Constructor",
+            "pages": [
+              "api/init",
+              "api/destroy"
+            ]
+          },
+          {
+            "group": "Playback",
+            "pages": [
+              "api/play",
+              "api/stop",
+              "api/stop-all",
+              "api/pause",
+              "api/resume",
+              "api/crossfade"
+            ]
+          },
+          {
+            "group": "Queue & Groups",
+            "pages": [
+              "api/queue",
+              "api/define-group",
+              "api/play-group"
+            ]
+          },
+          {
+            "group": "State & Queries",
+            "pages": [
+              "api/set-state",
+              "api/get-state",
+              "api/reset",
+              "api/get-anim",
+              "api/is-playing"
+            ]
+          },
+          {
+            "group": "Events",
+            "pages": [
+              "api/on-marker",
+              "api/on-stopped"
+            ]
+          },
+          {
+            "group": "Motion Helpers",
+            "pages": [
+              "api/tween",
+              "api/lerp",
+              "api/ragdoll",
+              "api/unragdoll"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Simple animation playback with priority levels (Idle, Movement, Action, Action2–Action4)",
+    "Animation queue system for sequencing non-looping animations",
+    "Crossfade between animations with configurable blend time",
+    "Pause and resume individual animations without stopping them",
+    "Animation groups for randomly selecting from a set of animations",
+    "State machine integration for tracking per-model animation states",
+    "Marker and stop event callbacks for precise animation timing",
+    "Built-in ragdoll physics with automatic cleanup and optional duration",
+    "Lerp helper for smoothly moving BaseParts and Models over time",
+    "TweenService wrapper for property tweening"
+  ],
+  "publicApiSurface": [
+    "AnimationService.init(options)",
+    "AnimationService:play(model, id, animType, looped, fadeTime)",
+    "AnimationService:stop(model, id, fadeTime)",
+    "AnimationService:stopAll(model, fadeTime)",
+    "AnimationService:pause(model, id)",
+    "AnimationService:resume(model, id)",
+    "AnimationService:crossFade(model, fromId, toId, time)",
+    "AnimationService:queue(model, id)",
+    "AnimationService:defineGroup(name, list)",
+    "AnimationService:playGroup(model, groupName)",
+    "AnimationService:setState(model, state)",
+    "AnimationService:getState(model)",
+    "AnimationService:reset(model)",
+    "AnimationService:getAnim(model, id)",
+    "AnimationService:isPlaying(model, id)",
+    "AnimationService:onMarker(model, id, marker, callback)",
+    "AnimationService:onStopped(model, id, callback)",
+    "AnimationService:tween(instance, info, goal)",
+    "AnimationService:lerp(instance, fromValue, toValue, duration, alphaFn)",
+    "AnimationService:ragdoll(model, duration)",
+    "AnimationService:unragdoll(model)",
+    "AnimationService:destroy(model)"
+  ]
+}

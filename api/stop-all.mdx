@@ -1,0 +1,38 @@
+---
+title: "AnimationService:stopAll() — Stop All Animations"
+sidebarTitle: "StopAll"
+description: "Immediately stop every animation track currently loaded for a model, blending them all out over a shared fade duration you control."
+---
+
+`AnimationService:stopAll()` is a convenience method that stops every animation EZAnim is currently tracking for a given model in one call. It is equivalent to calling `:stop(model, nil, fadeTime)`, but expresses intent more clearly when you know you want a full stop rather than targeting a specific track. A common use case is resetting a character's animation state on death or respawn.
+
+## Signature
+
+```lua
+AnimationService:stopAll(model, fadeTime)
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The model whose animations you want to stop. All active tracks for this model will be faded out and stopped. If no animations are currently playing, the call is a no-op.
+</ParamField>
+
+<ParamField path="fadeTime" type="number">
+  The blend-out duration in seconds applied to every track being stopped. Defaults to `0.15`.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Stop everything on character death
+Anim:stopAll(char, 0.5)
+```
+
+<Note>
+  `stopAll()` is functionally identical to `stop(model, nil, fadeTime)`. Both stop every animation currently loaded for the model. Use whichever form is clearest in context — `:stopAll()` signals the intent more explicitly.
+</Note>

@@ -1,0 +1,42 @@
+---
+title: "Get a Loaded AnimationTrack in EZAnim — getAnim()"
+sidebarTitle: "getAnim"
+description: "Retrieve the AnimationTrack EZAnim has already loaded for a given animation ID on a model, or nil if that animation has not yet been played or loaded."
+---
+
+The `getAnim` method looks up and returns the `AnimationTrack` that EZAnim internally loaded for a specific animation ID on a given model. Tracks are loaded on first play, so this method only returns a non-nil value after the animation has been played at least once on that model. Use it when you need to inspect track properties like `Length`, manually adjust `Speed` or `Weight`, or connect to native `AnimationTrack` events directly.
+
+<ParamField path="model" type="Model" required>
+  The character or model whose loaded animation tracks you want to query.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key whose loaded `AnimationTrack` you want to retrieve.
+</ParamField>
+
+## Returns
+
+<ResponseField name="AnimationTrack | nil" type="AnimationTrack | nil">
+  The cached `AnimationTrack` for the given ID, or `nil` if the animation has never been played on this model and therefore has not been loaded yet.
+</ResponseField>
+
+## Example
+
+```lua
+local track = Anim:getAnim(char, "Run")
+if track then
+    print(track.Length)  -- animation length in seconds
+end
+```
+
+```lua
+-- Manually adjust playback speed on an already-loaded track
+local track = Anim:getAnim(char, "Run")
+if track then
+    track:AdjustSpeed(1.5)
+end
+```
+
+<Note>
+  `getAnim` returns `nil` if the animation has never been played on this model — it has not been loaded yet. To guarantee the track exists, call `:play()` first, then retrieve it with `getAnim` or use the `AnimationTrack` returned directly by `:play()`.
+</Note>

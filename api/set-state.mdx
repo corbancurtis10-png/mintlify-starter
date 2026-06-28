@@ -1,0 +1,45 @@
+---
+title: "Set a Model's Animation State in EZAnim — setState()"
+sidebarTitle: "setState"
+description: "Store an arbitrary state value on a model inside EZAnim so your code can read it back with getState() and drive animation transitions accordingly."
+---
+
+The `setState` method attaches an arbitrary value to a model within EZAnim's internal tracking. You can store any Luau value — a string label like `"Running"`, a number representing a stance index, a table with multiple flags, or anything else your logic requires. EZAnim itself does not react to state changes or trigger any animation transitions on your behalf; the state is purely a convenience slot you manage and read back with `:getState()`.
+
+<ParamField path="model" type="Model" required>
+  The character or model to associate the state value with.
+</ParamField>
+
+<ParamField path="state" type="any" required>
+  The value to store. Accepts any Luau type: string, number, boolean, table, or nil to clear the state.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Mark the character as running
+Anim:setState(char, "Running")
+Anim:play(char, "Run", "Movement", true, 0.15)
+```
+
+```lua
+-- Store a compound state as a table
+Anim:setState(char, { mode = "Combat", weapon = "Sword" })
+```
+
+```lua
+-- Clear the state explicitly
+Anim:setState(char, nil)
+```
+
+<Note>
+  EZAnim does **not** drive animation changes based on state. You are responsible for reading the state with `:getState()` and deciding which animations to play. Think of this as a lightweight label slot, not a state machine.
+</Note>
+
+<Tip>
+  Pairing `setState` and `getState` with `onStopped` callbacks gives you a simple pattern for building animation state machines without external dependencies.
+</Tip>

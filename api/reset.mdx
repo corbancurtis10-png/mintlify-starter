@@ -1,0 +1,41 @@
+---
+title: "Reset a Model's Animation Data in EZAnim — reset()"
+sidebarTitle: "reset"
+description: "Stop all playing animations, clear the animation queue, and wipe the stored state for a model — ideal for character respawns and scene transitions."
+---
+
+The `reset` method performs a clean sweep of all runtime animation data associated with a model. It calls `stopAll()` to halt every active animation track, sets the model's stored state to `nil`, and empties the animation queue. This is the recommended call whenever a character respawns, a scene transition occurs, or you need to return a model to a known blank slate before replaying its intro animation.
+
+<ParamField path="model" type="Model" required>
+  The character or model to reset. All playing animations, queued IDs, and stored state for this model are cleared.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- On character respawn: reset then start fresh
+Anim:reset(char)
+Anim:play(char, "Idle", "Idle", true)
+```
+
+```lua
+-- In a round-end cleanup loop
+for _, player in ipairs(Players:GetPlayers()) do
+    local char = player.Character
+    if char then
+        Anim:reset(char)
+    end
+end
+```
+
+<Note>
+  `reset` does **not** destroy the underlying animator instance or the animation track cache. If you need full cleanup — for example when a model is being removed from the game permanently — call `:destroy()` instead.
+</Note>
+
+<Tip>
+  Pair `reset` with a short fade-in on the first animation you play afterward. Because `stopAll()` cuts tracks immediately, a small `fadeTime` value (e.g., `0.15`) on the first `:play()` after reset prevents a jarring pop.
+</Tip>

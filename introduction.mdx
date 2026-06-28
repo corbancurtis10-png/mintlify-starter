@@ -1,0 +1,44 @@
+---
+title: "Introduction to EZAnim — What It Is and Why It Exists"
+sidebarTitle: "Introduction"
+description: "Understand the core philosophy behind EZAnim, the problems it solves for Roblox developers, and how it integrates into your game project."
+---
+
+Managing animations in Roblox means juggling `AnimationTrack` references, remembering to unload tracks on cleanup, manually handling priority conflicts, and wiring up state changes across multiple scripts. EZAnim replaces that scattered boilerplate with a single service module: you describe your animations once in an initialisation table, and every play, pause, blend, queue, and ragdoll operation is available through a consistent API tied to the character model you pass in.
+
+## What EZAnim does
+
+EZAnim is a **Luau animation service** for Roblox. It wraps the engine's native `AnimationTrack` and `Animator` APIs behind a model-keyed interface, so every call you make operates on a specific character without you needing to hold a reference to individual tracks yourself. EZAnim also provides a queue system for sequencing animations, crossfade blending for smooth transitions, a lightweight state machine, animation event callbacks, and ragdoll physics helpers — features that would otherwise require significant custom infrastructure in each project.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Animation Playback with Priorities" icon="play">
+    Play any registered animation on any character model with a named priority level — `Idle`, `Movement`, `Action` through `Action4` — so the engine always resolves conflicts predictably.
+  </Card>
+  <Card title="Queue System" icon="list">
+    Chain animations back-to-back using `queue`. EZAnim automatically plays the next animation in the sequence as soon as the current one finishes, without any manual `onStopped` wiring on your part.
+  </Card>
+  <Card title="Crossfade Blending" icon="shuffle">
+    Transition smoothly between two animations using `crossFade`. Specify a blend duration and EZAnim handles stopping the outgoing track while ramping up the incoming one in a single call.
+  </Card>
+  <Card title="Ragdoll Physics" icon="person-falling">
+    Drop any character into a ragdoll state with `ragdoll` and restore them with `unragdoll`. Pass an optional duration to let EZAnim schedule the recovery automatically.
+  </Card>
+  <Card title="State Machine" icon="diagram-project">
+    Attach arbitrary state to a model with `setState` and read it back with `getState`. Use this to drive animation decisions — for example, switching between combat and exploration animation sets — from a single source of truth.
+  </Card>
+  <Card title="Event Callbacks" icon="bell">
+    Subscribe to animation marker events and track-stopped events using `onMarker` and `onStopped`. Both return an `RBXScriptConnection` you can disconnect at any time.
+  </Card>
+</CardGroup>
+
+## How EZAnim fits into a Roblox project
+
+EZAnim is a plain `ModuleScript`. You place it anywhere accessible to the scripts that need it — typically `ReplicatedStorage` for shared client/server use, or `ServerScriptService` for server-only logic — and `require` it like any other module. There are no external dependencies, no Roblox packages to install, and no framework to adopt.
+
+Because every EZAnim method takes a `model` as its first argument, the same `Anim` service instance works for every character in your game. You initialise once, then pass whichever model you need to animate. When a character is removed from the game, call `Anim:destroy(model)` to release its tracks and internal state — that single call is all the cleanup EZAnim needs.
+
+<Note>
+  EZAnim automatically creates an `Animator` instance under a model's `Humanoid` if one does not already exist. You do not need to set up the `Animator` manually before calling any playback methods.
+</Note>

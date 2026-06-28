@@ -1,0 +1,45 @@
+---
+title: "AnimationService:stop() — Stop an Animation"
+sidebarTitle: "Stop"
+description: "Stop a specific named animation on a model with an optional blend-out time. Omit the id to stop every animation currently playing on the model."
+---
+
+`AnimationService:stop()` halts an active animation track on a model and blends it out over a configurable duration. You can target a single animation by its key, or omit the `id` argument entirely to stop every animation currently running on the model at once. Stopped tracks are removed from EZAnim's active tracking for that model.
+
+## Signature
+
+```lua
+AnimationService:stop(model, id, fadeTime)
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The model whose animation you want to stop. If the model has no tracked animations, the call is a no-op.
+</ParamField>
+
+<ParamField path="id" type="string">
+  The animation key from your `List` table to stop. If you omit this argument or pass `nil`, EZAnim stops **all** animations currently playing on the model — equivalent to calling `:stopAll()`.
+</ParamField>
+
+<ParamField path="fadeTime" type="number">
+  The blend-out duration in seconds. The animation weight fades to zero over this period before the track is fully stopped. Defaults to `0.15`.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Stop a specific animation with a custom fade
+Anim:stop(char, "Run", 0.2)
+
+-- Stop all animations on the model
+Anim:stop(char, nil, 0.3)
+```
+
+<Tip>
+  If you need to transition from one animation directly into another, prefer `:crossFade()` over calling `:stop()` followed by `:play()`. CrossFade coordinates both the fade-out and fade-in in a single call and produces a smoother result.
+</Tip>

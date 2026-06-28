@@ -1,0 +1,45 @@
+---
+title: "Tween Instance Properties in EZAnim — tween()"
+sidebarTitle: "tween"
+description: "Create and immediately play a TweenService tween on any Instance, returning the active Tween object so you can chain callbacks or cancel it later."
+---
+
+The `tween` method is a concise wrapper around `TweenService:Create()` that creates a tween and calls `:Play()` on it in one step, then returns the active `Tween` object. Use it to animate instance properties — transparency, color, size, light brightness, UI position, and anything else driven by a property value — without boilerplate TweenService setup. The returned `Tween` gives you access to the `Completed` event and the `:Cancel()` method if you need further control.
+
+<ParamField path="instance" type="Instance" required>
+  The Roblox Instance whose properties you want to animate.
+</ParamField>
+
+<ParamField path="info" type="TweenInfo" required>
+  A `TweenInfo` value describing the duration, easing style, easing direction, repeat count, and delay.
+</ParamField>
+
+<ParamField path="goal" type="table" required>
+  A dictionary of property names to their target values. Each key must be a valid, tweenable property name on the given instance.
+</ParamField>
+
+## Returns
+
+<ResponseField name="Tween" type="Tween">
+  The `Tween` object, already playing. Connect to `Tween.Completed` or call `Tween:Cancel()` as needed.
+</ResponseField>
+
+## Example
+
+```lua
+local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+Anim:tween(part, info, { Transparency = 1, Size = Vector3.new(0, 0, 0) })
+```
+
+```lua
+-- Fade a UI frame out, then destroy it
+local info = TweenInfo.new(0.3, Enum.EasingStyle.Linear)
+local t = Anim:tween(frame, info, { BackgroundTransparency = 1 })
+t.Completed:Once(function()
+    frame:Destroy()
+end)
+```
+
+<Tip>
+  Use `tween` for **property** changes — transparency, color, size, brightness. For moving a part or model through 3D space, use `:lerp()` instead, which operates on `RunService.Heartbeat` and supports custom easing functions.
+</Tip>

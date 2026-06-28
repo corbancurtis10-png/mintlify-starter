@@ -1,0 +1,36 @@
+---
+title: "Queue an Animation in EZAnim — AnimationService:queue()"
+sidebarTitle: "queue"
+description: "Add an animation ID to a model's queue so it auto-plays after the current non-looping animation finishes, enabling seamless combo chains."
+---
+
+The `queue` method appends an animation key to a model's internal animation queue. Once a non-looping animation started with `:play()` finishes, EZAnim automatically plays the first queued animation ID. This makes it straightforward to chain sequences like attack combos, cutscene segments, or sequential emotes without manually tracking when each clip ends.
+
+<ParamField path="model" type="Model" required>
+  The character or model whose animation queue you want to append to.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key to add to the end of the queue. This must correspond to a key in your animation List table.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Example
+
+```lua
+-- Play Attack1 immediately, then chain Attack2 → Attack3 automatically
+Anim:play(char, "Attack1", "Action", false)
+Anim:queue(char, "Attack2")
+Anim:queue(char, "Attack3")
+```
+
+<Note>
+  Queued animations play with default settings (priority, looping, fade time). If you need custom parameters for a queued animation, trigger it manually inside an `onStopped` callback instead.
+</Note>
+
+<Warning>
+  Looping animations do **not** trigger queue processing. The queue only advances when a non-looping animation finishes. If you call `:play()` with `looping = true`, any pending queued IDs will remain waiting indefinitely.
+</Warning>

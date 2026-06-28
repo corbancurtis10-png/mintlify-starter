@@ -1,0 +1,46 @@
+---
+title: "Play a Random Group Animation in EZAnim — playGroup()"
+sidebarTitle: "playGroup"
+description: "Pick and play a random animation from a previously defined group on a model, returning the resulting AnimationTrack or nil if the group is unknown."
+---
+
+The `playGroup` method selects a random animation key from a group you previously registered with `:defineGroup()` and plays it on the given model. It returns the resulting `AnimationTrack` so you can connect events or inspect its properties immediately after the call. This is the companion to `defineGroup` and is how you introduce natural, non-repetitive variation into your game's animation system.
+
+<ParamField path="model" type="Model" required>
+  The character or model on which to play the randomly selected animation.
+</ParamField>
+
+<ParamField path="groupName" type="string" required>
+  The name of the group to draw from. Must match a name previously passed to `:defineGroup()`.
+</ParamField>
+
+## Returns
+
+<ResponseField name="AnimationTrack | nil" type="AnimationTrack | nil">
+  The `AnimationTrack` for the randomly selected animation, or `nil` if the group name has never been defined.
+</ResponseField>
+
+## Example
+
+```lua
+-- Play a random hit reaction from the group
+Anim:playGroup(char, "HitReactions")
+```
+
+```lua
+-- Capture the track to listen for when it stops
+local track = Anim:playGroup(char, "HitReactions")
+if track then
+    track.Stopped:Once(function()
+        Anim:play(char, "Idle", "Idle", true, 0.2)
+    end)
+end
+```
+
+<Note>
+  `playGroup` uses `math.random` to select from the group list. If your group contains only one entry, it will always play that entry — consider whether a plain `:play()` call better communicates intent in that case.
+</Note>
+
+<Warning>
+  If you pass a `groupName` that was never registered with `:defineGroup()`, this method returns `nil` and plays nothing. Always define your groups before calling `playGroup`.
+</Warning>

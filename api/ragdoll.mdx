@@ -1,0 +1,46 @@
+---
+title: "Ragdoll a Character Rig in EZAnim — ragdoll()"
+sidebarTitle: "ragdoll"
+description: "Disable Motor6D joints and apply physics-based ragdoll constraints to a character, with an optional duration to auto-recover after a set number of seconds."
+---
+
+The `ragdoll` method converts a character rig into a physics-driven ragdoll by disabling every `Motor6D` joint, replacing each one with a `BallSocketConstraint` backed by `Attachment` instances, and switching the `Humanoid` state to `Physics` while disabling `AutoRotate`. The character's parts then fall and collide freely under Roblox's physics simulation. You can optionally pass a `duration` to have EZAnim call `:unragdoll()` automatically after that many seconds, or omit it and call `:unragdoll()` yourself at whatever point your game logic decides the character should recover.
+
+<ParamField path="model" type="Model" required>
+  The character model to ragdoll. Must contain `Motor6D` joints — works with standard Roblox R6 and R15 rigs.
+</ParamField>
+
+<ParamField path="duration" type="number">
+  Optional. If provided, EZAnim automatically calls `:unragdoll()` on the model after this many seconds. Omit to ragdoll indefinitely until you call `:unragdoll()` manually.
+</ParamField>
+
+## Returns
+
+This method returns `nil`.
+
+## Examples
+
+```lua
+-- Ragdoll for exactly 2 seconds, then auto-recover
+Anim:ragdoll(character, 2)
+```
+
+```lua
+-- Ragdoll indefinitely — recover manually on some condition
+Anim:ragdoll(character)
+
+-- ... later, when the player presses a button or recovers health:
+Anim:unragdoll(character)
+```
+
+<Warning>
+  Stop any active animations before calling `ragdoll`. Animations running through the `Animator` can conflict with the physics simulation and produce jittery or unnatural results. Call `:stopAll()` or `:reset()` first.
+</Warning>
+
+<Note>
+  `ragdoll` requires `Motor6D` joints to be present in the model. It works with standard Roblox R6 and R15 rigs. Custom rigs must also use `Motor6D` joints for this method to have any effect.
+</Note>
+
+<Tip>
+  For death sequences, consider pairing `ragdoll` with a short duration and an `onStopped` callback on any final animation, so the ragdoll triggers only after the death clip finishes.
+</Tip>

@@ -1,0 +1,63 @@
+---
+title: "AnimationService:play() — Play an Animation"
+sidebarTitle: "Play"
+description: "Load and play a named animation on a model, with control over priority, looping, and blend-in time. Returns the live AnimationTrack or nil on failure."
+---
+
+`AnimationService:play()` is the primary way to start an animation on a character or NPC. You pass the model, the string key you defined in your `List`, and optional parameters to control how the animation blends in, what priority it plays at, and whether it loops. EZAnim handles animator creation and asset caching automatically, so you can call this method freely without worrying about redundant loads.
+
+## Signature
+
+```lua
+AnimationService:play(model, id, animType, looped, fadeTime) -> AnimationTrack | nil
+```
+
+## Parameters
+
+<ParamField path="model" type="Model" required>
+  The character or NPC model to animate. The model must contain a `Humanoid`. If no `Animator` exists under the Humanoid, EZAnim will create one automatically.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The animation key from your `List` table, exactly as you defined it during `init()`. If the key does not exist in the list, the method returns `nil`.
+</ParamField>
+
+<ParamField path="animType" type="string">
+  The Roblox animation priority level. Must be one of: `"Idle"`, `"Movement"`, `"Action"`, `"Action2"`, `"Action3"`, or `"Action4"`. The value is case-insensitive. Defaults to `"Movement"`.
+</ParamField>
+
+<ParamField path="looped" type="boolean">
+  Whether the animation should loop continuously. Defaults to `false`. For non-looping animations, EZAnim will automatically trigger the next queued animation when the track stops.
+</ParamField>
+
+<ParamField path="fadeTime" type="number">
+  The blend-in duration in seconds. Controls how long EZAnim takes to transition into this animation from whatever is currently playing. Defaults to `0.15`.
+</ParamField>
+
+## Returns
+
+<ResponseField name="AnimationTrack" type="AnimationTrack | nil">
+  The active `AnimationTrack` for the animation, or `nil` if the model was invalid, the `id` was not found in the list, or the model has no `Humanoid`. If the animation was already playing, the existing track is returned without restarting it.
+</ResponseField>
+
+## Example
+
+```lua
+-- Play a looping idle animation
+Anim:play(char, "Idle", "Idle", true, 0.15)
+
+-- Play a one-shot attack animation
+Anim:play(char, "Attack", "Action", false, 0.1)
+
+-- Capture the track to inspect it
+local track = Anim:play(char, "Run", "Movement", true)
+print(track.IsPlaying)  -- true
+```
+
+<Note>
+  If you call `:play()` for an animation that is already playing on the model, EZAnim returns the existing track instead of restarting it. To force a restart, call `:stop()` first and then call `:play()` again.
+</Note>
+
+<Tip>
+  Animation assets are cached per model after the first load. Calling `:play()` with the same `id` on the same model multiple times does not reload the asset from Roblox — it reuses the cached animation object, keeping transitions fast.
+</Tip>
