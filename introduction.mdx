@@ -13,22 +13,22 @@ EZAnim is a **Luau animation service** for Roblox. It wraps the engine's native 
 ## Key features
 
 <CardGroup cols={2}>
-  <Card title="Animation Playback with Priorities" icon="play">
+  <Card title="Animation Playback with Priorities" icon="play" href="/concepts/priorities">
     Play any registered animation on any character model with a named priority level — `Idle`, `Movement`, `Action` through `Action4` — so the engine always resolves conflicts predictably.
   </Card>
-  <Card title="Queue System" icon="list">
+  <Card title="Queue System" icon="list" href="/guides/queuing">
     Chain animations back-to-back using `queue`. EZAnim automatically plays the next animation in the sequence as soon as the current one finishes, without any manual `onStopped` wiring on your part.
   </Card>
-  <Card title="Crossfade Blending" icon="shuffle">
+  <Card title="Crossfade Blending" icon="shuffle" href="/guides/crossfade">
     Transition smoothly between two animations using `crossFade`. Specify a blend duration and EZAnim handles stopping the outgoing track while ramping up the incoming one in a single call.
   </Card>
-  <Card title="Ragdoll Physics" icon="person-falling">
+  <Card title="Ragdoll Physics" icon="person-falling" href="/guides/ragdoll">
     Drop any character into a ragdoll state with `ragdoll` and restore them with `unragdoll`. Pass an optional duration to let EZAnim schedule the recovery automatically.
   </Card>
-  <Card title="State Machine" icon="diagram-project">
+  <Card title="State Machine" icon="diagram-project" href="/concepts/state-system">
     Attach arbitrary state to a model with `setState` and read it back with `getState`. Use this to drive animation decisions — for example, switching between combat and exploration animation sets — from a single source of truth.
   </Card>
-  <Card title="Event Callbacks" icon="bell">
+  <Card title="Event Callbacks" icon="bell" href="/guides/events">
     Subscribe to animation marker events and track-stopped events using `onMarker` and `onStopped`. Both return an `RBXScriptConnection` you can disconnect at any time.
   </Card>
 </CardGroup>

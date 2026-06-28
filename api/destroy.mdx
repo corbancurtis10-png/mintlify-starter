@@ -1,7 +1,7 @@
 ---
-title: "AnimationService:destroy() — Clean Up a Model"
+title: "AnimationService:destroy() — Clean Up and Release a Model"
 sidebarTitle: "Destroy"
-description: "Stop all animation tracks, disconnect every event connection, and clear all internal state for a model, fully releasing its resources from EZAnim."
+description: "Stop all animation tracks, disconnect every event connection, and fully release all EZAnim resources held for a model, preventing memory leaks."
 ---
 
 `AnimationService:destroy()` performs a complete teardown of everything EZAnim is tracking for a given model. You should call it whenever a model is permanently removed from your game — such as when a player leaves or an NPC is despawned — to prevent memory leaks and stale event listeners from accumulating over a session.
@@ -15,7 +15,7 @@ AnimationService:destroy(model: Model)
 ## Parameters
 
 <ParamField path="model" type="Model" required>
-  The character or NPC model to clean up. EZAnim will stop and destroy all active animation tracks for this model, disconnect all event connections (including `onMarker` and `onStopped` listeners), and clear all internal state: tracks, animators, animation cache, connections, states, queues, and ragdoll data.
+  The character or NPC model to clean up. EZAnim will stop and destroy all active animation tracks for this model, disconnect all event connections (including `onMarker` and `onStopped` listeners), and clear all state EZAnim was maintaining for it — leaving no residual memory or callbacks behind.
 </ParamField>
 
 ## Returns

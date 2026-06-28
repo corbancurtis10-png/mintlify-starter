@@ -1,10 +1,10 @@
 ---
-title: "AnimationService:pause() — Pause an Animation"
+title: "AnimationService:pause() — Freeze a Playing Animation"
 sidebarTitle: "Pause"
 description: "Freeze a playing animation on its current frame by setting its speed to zero, preserving the prior speed so resume() can restore it exactly."
 ---
 
-`AnimationService:pause()` freezes a playing animation in place by setting its playback speed to `0`. The animation remains technically active — it is not stopped or unloaded — but it no longer advances through its frames. EZAnim stores the track's speed at the time of the pause so that `:resume()` can restore it to exactly the right value later.
+`AnimationService:pause()` freezes a playing animation in place by setting its playback speed to `0`. The animation remains technically active — it is not stopped or unloaded — but it no longer advances through its frames. The speed in effect at the moment of the pause is remembered so that `:resume()` can restore it to exactly the right value later.
 
 ## Signature
 

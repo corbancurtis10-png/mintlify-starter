@@ -1,7 +1,7 @@
 ---
-title: "Ragdoll Physics: Enabling and Recovering"
+title: "Ragdoll Physics in EZAnim: Enabling and Auto-Recovery"
 sidebarTitle: "Ragdoll"
-description: "Enable physics-based ragdoll on any standard Roblox rig, with optional auto-recovery and manual unragdoll control via EZAnim."
+description: "Enable physics-based ragdoll on any Roblox character rig with EZAnim, with optional timed auto-recovery and manual unragdoll control."
 ---
 
 EZAnim's ragdoll system converts a standard Roblox character rig into a physics-driven ragdoll by disabling its `Motor6D` joints, replacing them with `BallSocketConstraint` instances, and setting the `Humanoid` to the `Physics` state. When you're ready to recover the character, `:unragdoll()` reverses every change and returns the humanoid to `GettingUp` state.
@@ -35,7 +35,7 @@ Anim:unragdoll(character)
 ```
 </CodeGroup>
 
-When you pass a `duration`, EZAnim calls `:unragdoll()` automatically after that many seconds using an internal `task.delay`.
+When you pass a `duration`, EZAnim calls `:unragdoll()` automatically after that many seconds.
 
 ## Recovery with unragdoll
 

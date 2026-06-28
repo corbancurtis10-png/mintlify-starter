@@ -1,7 +1,7 @@
 ---
 title: "Listen for Animation End in EZAnim — onStopped()"
-sidebarTitle: "onStopped"
-description: "Register a one-time callback that fires when a specific animation stops playing, making it easy to chain transitions, reset state, or trigger follow-up logic."
+sidebarTitle: "OnStopped"
+description: "Register a callback that fires when a specific animation stops playing, making it easy to chain transitions, reset state, or trigger follow-up logic."
 ---
 
 The `onStopped` method connects a callback to the `Stopped` event of a loaded `AnimationTrack`, firing your function exactly once when that animation finishes or is manually stopped. This is the cleanest way to sequence animation-driven logic: clear a state flag, queue the next animation, re-enable input, or fade back into an idle — all triggered precisely when the clip ends rather than after an arbitrary wait.

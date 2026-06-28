@@ -1,5 +1,5 @@
 ---
-title: "Animation Groups for Randomized Playback"
+title: "EZAnim Groups: Randomized Animation Playback Variants"
 sidebarTitle: "Groups"
 description: "Learn how to define named animation groups in EZAnim and play a random entry from them to add procedural variety to characters and actions."
 ---
@@ -18,7 +18,7 @@ Anim:defineGroup("WalkVariants", { "Walk1", "Walk2", "Walk3" })
 Anim:playGroup(character, "WalkVariants")
 ```
 
-Every time `:playGroup()` is called, EZAnim picks a different entry from the group, keeping motion feeling natural and less mechanical over repeated plays.
+Every time `:playGroup()` is called, EZAnim picks a random entry from the group. Because the selection uses uniform randomness, the same entry may occasionally repeat, but over many calls the variety keeps motion feeling natural and less mechanical.
 
 ## Use Cases
 
@@ -28,6 +28,19 @@ Groups are especially useful in any situation where repetition would feel roboti
 - **Hit reactions** — randomize flinch animations so taking damage looks less scripted
 - **Idle fidgets** — cycle through small ambient movements (a glance, a stretch, a weight shift) during long idle periods
 - **Attack combos** — vary the visual of the same gameplay action without changing its mechanical properties
+
+## Return Value
+
+`:playGroup()` returns the `AnimationTrack` that was started, or `nil` if the group name has not been defined. You can use the returned track to connect to events such as `Stopped` or to stop the animation early.
+
+```lua
+local track = Anim:playGroup(character, "WalkVariants")
+if track then
+    track.Stopped:Connect(function()
+        -- animation finished naturally
+    end)
+end
+```
 
 ## Keys, Not Asset IDs
 

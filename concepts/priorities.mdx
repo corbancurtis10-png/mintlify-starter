@@ -1,5 +1,5 @@
 ---
-title: "Animation Priorities: Controlling Playback Order"
+title: "EZAnim Animation Priorities: Controlling Playback Order"
 sidebarTitle: "Priorities"
 description: "Understand EZAnim's six priority levels, how higher-priority animations override lower ones, and when to apply each level in your game."
 ---
@@ -21,7 +21,7 @@ The table below lists every supported priority in ascending order. When two anim
 
 ## Passing `animType` to `:play()`
 
-Supply the priority name as the third argument to `:play()`. The examples below show all four general tiers in a typical character setup:
+Supply the priority name as the third argument to `:play()`. The examples below demonstrate four of the six priority levels across a typical character setup:
 
 ```lua
 Anim:play(character, "Idle",    "Idle",     true,  0.15)  -- lowest priority

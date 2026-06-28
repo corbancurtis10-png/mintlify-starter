@@ -1,5 +1,5 @@
 ---
-title: "Responding to Animation Events and Markers"
+title: "Responding to Animation Events and Markers in EZAnim"
 sidebarTitle: "Events"
 description: "Use EZAnim's onMarker and onStopped callbacks to sync game logic — hit detection, sound cues, and state changes — directly to animation frames."
 ---
@@ -11,8 +11,12 @@ EZAnim exposes two event helpers that let your game logic respond to what's happ
 `:onMarker()` fires a callback when the animation reaches a named marker that you placed in the **Roblox Animation Editor**. This is the correct way to sync gameplay events — like dealing damage or playing a sound effect — to an exact frame rather than estimating with `task.wait`.
 
 ```lua
-AnimationService:onMarker(model, id, marker, callback) -> RBXScriptConnection
+AnimationService:onMarker(model, id, marker, callback) -> RBXScriptConnection | nil
 ```
+
+<Warning>
+  `:onMarker()` returns `nil` if the animation track is not yet loaded. Always call it **after** `:play()`, not before.
+</Warning>
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -38,7 +42,7 @@ end)
 `:onStopped()` fires a callback when the animation track stops, whether it finished naturally, was stopped manually, or was interrupted.
 
 ```lua
-AnimationService:onStopped(model, id, callback) -> RBXScriptConnection
+AnimationService:onStopped(model, id, callback) -> RBXScriptConnection | nil
 ```
 
 ```lua
@@ -86,7 +90,7 @@ end)
 </Steps>
 
 <Note>
-  Both `:onMarker()` and `:onStopped()` return an `RBXScriptConnection`. EZAnim stores these connections internally and disconnects them automatically when `destroy()` is called on the service. You only need to manage the connection manually if you want to disconnect before the service is destroyed.
+  Both `:onMarker()` and `:onStopped()` return an `RBXScriptConnection`, or `nil` if the track is not loaded. Store the connection and call `:Disconnect()` on it if you need to stop listening before the animation naturally ends.
 </Note>
 
 <Tip>

@@ -1,7 +1,7 @@
 ---
-title: "Playing, Stopping, and Pausing Animations"
+title: "Playing, Stopping, and Pausing Animations in EZAnim"
 sidebarTitle: "Playing Animations"
-description: "Learn how to play, stop, pause, and resume animations on Roblox character models using EZAnim's core animation API."
+description: "Learn how to play, stop, pause, and resume animations on any Roblox character model using EZAnim's core playback API with fade control."
 ---
 
 EZAnim gives you a straightforward API for driving character animations on any Roblox model that has a `Humanoid`. You play animations by ID, control how they blend in and out with fade times, and pause or resume them at any point — all through a single service instance.
@@ -11,7 +11,7 @@ EZAnim gives you a straightforward API for driving character animations on any R
 Use `:play()` to start an animation on a model. The method accepts the model, an animation ID key, an animation type, a looped flag, and a fade-in time.
 
 ```lua
-AnimationService:play(model, id, animType, looped, fadeTime) -> AnimationTrack
+AnimationService:play(model, id, animType, looped, fadeTime) -> AnimationTrack | nil
 ```
 
 | Parameter | Type | Default | Description |

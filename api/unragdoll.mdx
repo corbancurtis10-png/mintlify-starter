@@ -1,10 +1,10 @@
 ---
 title: "Restore a Ragdolled Character in EZAnim — unragdoll()"
-sidebarTitle: "unragdoll"
+sidebarTitle: "Unragdoll"
 description: "Re-enable all Motor6D joints, remove ragdoll constraints, and restore Humanoid controls to bring a physics-ragdolled character back to an animated state."
 ---
 
-The `unragdoll` method reverses everything that `:ragdoll()` did. It re-enables all `Motor6D` joints that were stored during ragdolling, destroys the `BallSocketConstraint` and `Attachment` instances that replaced them, restores `Humanoid.PlatformStand` to `false` and `AutoRotate` to `true`, and sets the `Humanoid` state to `GettingUp`. After this call the character is fully animated again and ready to play movement or recovery animations.
+The `unragdoll` method reverses everything that `:ragdoll()` did. It re-enables all `Motor6D` joints that were disabled during ragdolling, destroys the `BallSocketConstraint` and `Attachment` instances that replaced them, restores full `Humanoid` control including `AutoRotate`, and transitions the `Humanoid` state to `GettingUp`. After this call the character is fully animated again and ready to play movement or recovery animations.
 
 <ParamField path="model" type="Model" required>
   The character model to restore. Must be the same model passed to a previous `:ragdoll()` call.

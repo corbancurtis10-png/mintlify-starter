@@ -1,5 +1,5 @@
 ---
-title: "Crossfading Between Animations Smoothly"
+title: "Crossfading Between Animations Smoothly with EZAnim"
 sidebarTitle: "Crossfade"
 description: "Crossfade lets you transition between two animations simultaneously, fading one out while the other fades in for natural-looking blends."
 ---
@@ -11,7 +11,7 @@ A crossfade transition stops one animation and starts another at the same time, 
 `:crossFade()` calls `:stop()` on the `fromId` animation and `:play()` on the `toId` animation simultaneously, using the same `time` value for both the fade-out and fade-in.
 
 ```lua
-AnimationService:crossFade(model, fromId, toId, time) -> AnimationTrack
+AnimationService:crossFade(model, fromId, toId, time) -> AnimationTrack | nil
 ```
 
 | Parameter | Type | Description |
@@ -21,7 +21,7 @@ AnimationService:crossFade(model, fromId, toId, time) -> AnimationTrack
 | `toId` | `string` | Key of the animation to fade in |
 | `time` | `number` | Fade duration in seconds (applied to both directions) |
 
-`:crossFade()` returns the new `AnimationTrack` for `toId`.
+`:crossFade()` returns the new `AnimationTrack` for `toId`, or `nil` if the animation could not be started.
 
 ## Basic Usage
 
@@ -48,11 +48,13 @@ Anim:crossFade(char, "Idle", "Run", 0.3)
 </CodeGroup>
 
 <Note>
-  `:crossFade()` returns the new animation track (`toId`). Store it if you need to adjust the track's speed, weight, or connect events directly.
+  `:crossFade()` returns the new animation track for `toId`, or `nil` if the animation could not be started. Store the result if you need to adjust the track's speed, weight, or connect events directly — and guard against `nil` before using it.
 
   ```lua
   local runTrack = Anim:crossFade(char, "Idle", "Run", 0.25)
-  runTrack:AdjustSpeed(1.5)
+  if runTrack then
+      runTrack:AdjustSpeed(1.5)
+  end
   ```
 </Note>
 

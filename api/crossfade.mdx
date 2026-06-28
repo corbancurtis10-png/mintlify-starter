@@ -47,7 +47,7 @@ Anim:crossFade(char, "Run", "Idle", 0.25)
 ```
 
 <Note>
-  The new animation (`toId`) plays with a default `animType` of `"Movement"` and `looped = false` unless those values were previously configured for that key. If you need more control over priority or looping, call `:stop()` and `:play()` separately with explicit arguments.
+  The new animation (`toId`) always plays non-looping (`looped = false`) and uses a `animType` of `"Movement"`. These values are fixed by `:crossFade()` — if you need a different priority or a looping target animation, call `:stop()` and `:play()` separately with explicit arguments instead.
 </Note>
 
 <Tip>

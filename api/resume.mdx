@@ -4,7 +4,7 @@ sidebarTitle: "Resume"
 description: "Restore a paused animation to its original playback speed, continuing from the exact frame where it was frozen by a prior pause() call."
 ---
 
-`AnimationService:resume()` re-activates an animation that was frozen by `:pause()`, restoring it to the playback speed that was stored at pause time. The animation continues advancing through its frames from exactly where it left off — no blending or restarting occurs. If EZAnim has no stored speed on record for the given animation (for example, if `:pause()` was never called), it defaults to a speed of `1`.
+`AnimationService:resume()` re-activates an animation that was frozen by `:pause()`, restoring it to the playback speed it had before the pause. The animation continues advancing through its frames from exactly where it left off — no blending or restarting occurs. If `:pause()` was never called for the given animation, `:resume()` defaults to restoring a speed of `1`.
 
 ## Signature
 
@@ -37,5 +37,5 @@ Anim:resume(char, "Attack")
 ```
 
 <Note>
-  If no speed was stored from a previous `:pause()` call, `:resume()` defaults to restoring speed `1`. This means calling `:resume()` on a track that was never paused will simply set its speed to `1`, which is usually harmless but not the intended usage pattern.
+  If `:pause()` was never called on the given animation, `:resume()` defaults to restoring a speed of `1`. This means calling `:resume()` on a track that was never paused will simply set its speed to `1`, which is usually harmless but not the intended usage pattern.
 </Note>
